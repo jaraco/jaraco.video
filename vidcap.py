@@ -49,6 +49,9 @@ class Device(object):
 		filter_ob = moniker.RemoteBindToObject(null_context,null_moniker,IBaseFilter._iid_)
 		
 		self.filter_graph.AddFilter(filter_ob, "VideoCapture")
+		
+		# self.grabber = CreateObject(SampleGrabber)
+		#self.filter_graph.AddFilter(self.grabber, "Grabber")
 
 def test():
 	d = Device()
