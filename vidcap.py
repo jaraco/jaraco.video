@@ -12,6 +12,19 @@ from ctypes.wintypes import RECT, DWORD, LONG, WORD
 class error(Exception):
 	pass
 
+class VidCapError(Exception): pass
+
+def FAILED(hr):
+	"http://msdn.microsoft.com/en-us/library/ms693474(VS.85).aspx"
+	return hr < 0
+
+# WinError.h
+E_INVALIDARG = 0x80070057
+E_POINTER = 0x80004003
+# vfwmsgs.h
+VFW_E_NOT_CONNECTED = 0x80040209
+VFW_E_WRONG_STATE = 0x80040227
+
 CLSID_VideoInputDeviceCategory = GUID("{860BB310-5D01-11d0-BD3B-00A0C911CE86}")
 
 CLSID_SystemDeviceEnum = GUID('{62BE5D10-60EB-11d0-BD3B-00A0C911CE86}')
@@ -132,79 +145,33 @@ class Device(object):
 		
 		p_video_info_header = cast(media_type.pbFormat, POINTER(VIDEOINFOHEADER))
 		
-		raise NotImplementedError, "Complete implementation stops here"
-"""
-    AM_MEDIA_TYPE MediaType;
-    hr = self->ob_pGrab->GetConnectedMediaType(&MediaType);
-    if (FAILED(hr))
-    {
-        PyErr_SetString(VidcapError, "Getting the sample grabber's connected media type failed.");
-        return NULL;
-    }
-
-    // Get a pointer to the video header.
-    VIDEOINFOHEADER *pVideoHeader = (VIDEOINFOHEADER*)MediaType.pbFormat;
-
-    long size   = pVideoHeader->bmiHeader.biSizeImage;
-    long width  = pVideoHeader->bmiHeader.biWidth;
-    long height = pVideoHeader->bmiHeader.biHeight;
-
-    // Free the format block
-    //FreeMediaType(MediaType); // this would need the DirectShow Base Classes
-    CoTaskMemFree(MediaType.pbFormat);
-
-    // Allocate memory.
-    //void *buffer = malloc(size);
-    void *buffer = PyMem_Malloc(size);
-    if (!buffer)
-    {
-        PyErr_NoMemory();
-        return NULL;
-    }
-
-    hr = self->ob_pControl->Run(); // fixme: xxx
-    // Copy the image into the buffer.
-    while (true)
-    {
-        hr = self->ob_pGrab->GetCurrentBuffer(&size, (long *)buffer);
-        if (hr == VFW_E_WRONG_STATE)
-            Sleep(100);
-        else
-            break;
-    }
-    if (FAILED(hr))
-    {
-        switch (hr)
-        {
-        case E_INVALIDARG:
-            PyErr_SetString(VidcapError, "Getting the sample grabber's current buffer failed (Samples are not being buffered).");
-            break;
-        case E_POINTER:
-            PyErr_SetString(VidcapError, "Getting the sample grabber's current buffer failed (NULL pointer argument).");
-            break;
-        case VFW_E_NOT_CONNECTED:
-            PyErr_SetString(VidcapError, "Getting the sample grabber's current buffer failed (The filter is not connected).");
-            break;
-        case VFW_E_WRONG_STATE:
-            PyErr_SetString(VidcapError, "Getting the sample grabber's current buffer failed (The filter did not buffer a sample yet).");
-            break;
-        default:
-            PyErr_SetString(VidcapError, "UNKNOWN CASE!!");
-        }
-        PyMem_Free(buffer);
-        return NULL;
-    }
-
-    // Return the buffer.
-    PyObject *value;
-    value = Py_BuildValue("(s#,l,l)", buffer, size, width, height);
-
-    //free(buffer);
-    PyMem_Free(buffer);
-
-    return value;
-"""
-
+		# windll.ole32.CoTaskMemFree(media_type.pbFormat) ?
+		
+		size = p_video_info_header.bmi_header.size # .contents.bmi_header.size?
+		width = p_video_info_header.bmi_header.width
+		height = p_video_info_header.bmi_header.height
+		size = DWORD(size)
+		buffer = ctypes.create_string_buffer(size)
+		
+		self.filter_graph.Run()
+		
+		while(True):
+			# long_p_buffer = cast(buffer, c_long_p)
+			res = self.grabber.GetCurrentBuffer(byref(size), buffer))
+			sleep(100) if res == VFW_E_WRONG_STATE else break
+		
+		if FAILED(res):
+			error_map = dict(
+				E_INVALIDARG="Samples are not being buffered",
+				E_POINTER="NULL pointer argument",
+				VFW_E_NOT_CONNECTED="The filter is not connected",
+				VFW_E_WRONG_STATE="The filter did not buffer a sample yet",
+			)
+			unknown_error = 'Unknown Error ({0:x})'.format(res)
+			msg = "Getting the sample grabber's current buffer failed ({0}).".format(error_map.get(res, unknown_error))
+			raise VidcapError(msg)
+		
+		return bytes(buffer)[:size], width, height
 
 def test():
 	d = Device(show_video_window=True)
