@@ -1,0 +1,1341 @@
+// Generated .IDL file (by the OLE/COM Object Viewer)
+// 
+// typelib filename: qedit.dll
+
+[
+  uuid(78530B68-61F9-11D2-8CAD-00A024580902),
+  version(1.0),
+  helpstring("Dexter 1.0 Type Library")
+]
+library DexterLib
+{
+    // TLib :     // TLib : OLE Automation : {00020430-0000-0000-C000-000000000046}
+    importlib("STDOLE2.TLB");
+    importlib("DirectShow.tlb");
+
+    // Forward declare all types defined in this typelib
+    interface IResize;
+    interface IAMTimeline;
+    interface IAMTimelineObj;
+    interface IPropertySetter;
+    interface IAMTimelineGroup;
+    interface IAMTimelineSrc;
+    interface IMediaLocator;
+    interface IAMSetErrorLog;
+    interface IAMErrorLog;
+    interface IAMTimelineEffectable;
+    interface IAMTimelineSplittable;
+    interface IAMTimelineTrack;
+    interface IAMTimelineTransable;
+    interface IAMTimelineVirtualTrack;
+    interface IAMTimelineComp;
+    interface IAMTimelineTrans;
+    interface IAMTimelineEffect;
+    interface IErrorLog;
+    interface IRenderEngine;
+    interface IGrfCache;
+    interface IRenderEngine2;
+    interface ISmartRenderEngine;
+    interface IFindCompressorCB;
+    interface IXml2Dex;
+    interface IMediaDet;
+    interface ISampleGrabber;
+    interface ISampleGrabberCB;
+    interface IDxtCompositor;
+    interface IDXEffect;
+    interface IDxtAlphaSetter;
+    interface IDxtJpeg;
+    interface IDxtKey;
+
+    typedef enum {
+        PINDIR_INPUT = 0,
+        PINDIR_OUTPUT = 1
+    } _PinDirection;
+
+    typedef struct tag_PinInfo {
+                
+IBaseFilter* pFilter;
+                
+_PinDirection dir;
+                
+unsigned short achName[128];
+    } _PinInfo;
+
+    typedef enum {
+        State_Stopped = 0,
+        State_Paused = 1,
+        State_Running = 2
+    } _FilterState;
+
+    typedef struct tag_FilterInfo {
+                
+unsigned short achName[128];
+                
+IFilterGraph* pGraph;
+    } _FilterInfo;
+
+    typedef struct tag_AMMediaType {
+                
+GUID majortype;
+                
+GUID subtype;
+                
+long bFixedSizeSamples;
+                
+long bTemporalCompression;
+                
+unsigned long lSampleSize;
+                
+GUID formattype;
+                
+IUnknown* pUnk;
+                
+unsigned long cbFormat;
+                
+unsigned char* pbFormat;
+    } _AMMediaType;
+
+    typedef [public]
+    __MIDL___MIDL_itf_qedit_0000_0002 DEXTER_PARAM;
+
+    typedef struct tag__MIDL___MIDL_itf_qedit_0000_0002 {
+                
+BSTR Name;
+                
+long dispID;
+                
+long nValues;
+    } __MIDL___MIDL_itf_qedit_0000_0002;
+
+    typedef [public]
+    __MIDL___MIDL_itf_qedit_0000_0003 DEXTER_VALUE;
+
+    typedef struct tag__MIDL___MIDL_itf_qedit_0000_0003 {
+                
+VARIANT v;
+                
+int64 rt;
+                
+unsigned long dwInterp;
+    } __MIDL___MIDL_itf_qedit_0000_0003;
+
+    typedef [public]
+    __MIDL___MIDL_itf_qedit_0000_0007 TIMELINE_MAJOR_TYPE;
+
+    [
+      odl,
+      uuid(4ADA63A0-72D5-11D2-952A-0060081840BC),
+      helpstring("IResize Interface")
+    ]
+    interface IResize : IUnknown {
+        HRESULT _stdcall get_Size(
+                        [out] int* piHeight, 
+                        [out] int* piWidth, 
+                        [out] long* pFlag);
+        HRESULT _stdcall get_InputSize(
+                        [out] int* piHeight, 
+                        [out] int* piWidth);
+        HRESULT _stdcall put_Size(
+                        [in] int Height, 
+                        [in] int Width, 
+                        [in] long Flag);
+        HRESULT _stdcall get_MediaType([out] _AMMediaType* pmt);
+        HRESULT _stdcall put_MediaType([in] _AMMediaType* pmt);
+    };
+
+    [
+      uuid(78530B75-61F9-11D2-8CAD-00A024580902),
+      helpstring("AMTimeline Class")
+    ]
+    coclass AMTimeline {
+        [default] interface IAMTimeline;
+        interface IPersistStream;
+        interface IAMSetErrorLog;
+    };
+
+    [
+      odl,
+      uuid(78530B74-61F9-11D2-8CAD-00A024580902),
+      helpstring("IAMTimeline Interface")
+    ]
+    interface IAMTimeline : IUnknown {
+        [helpstring("method CreateEmptyNode")]
+        HRESULT _stdcall CreateEmptyNode(
+                        [out] IAMTimelineObj** ppObj, 
+                        TIMELINE_MAJOR_TYPE Type);
+        HRESULT _stdcall AddGroup(IAMTimelineObj* pGroup);
+        HRESULT _stdcall RemGroupFromList(IAMTimelineObj* pGroup);
+        HRESULT _stdcall GetGroup(
+                        [out] IAMTimelineObj** ppGroup, 
+                        long WhichGroup);
+        HRESULT _stdcall GetGroupCount(long* pCount);
+        HRESULT _stdcall ClearAllGroups();
+        HRESULT _stdcall GetInsertMode(long* pMode);
+        [helpstring("method SetInsertMode")]
+        HRESULT _stdcall SetInsertMode(long Mode);
+        [helpstring("method EnableTransitions")]
+        HRESULT _stdcall EnableTransitions(long fEnabled);
+        [helpstring("method TransitionsEnabled")]
+        HRESULT _stdcall TransitionsEnabled(long* pfEnabled);
+        [helpstring("method EnableEffects")]
+        HRESULT _stdcall EnableEffects(long fEnabled);
+        [helpstring("method EffectsEnabled")]
+        HRESULT _stdcall EffectsEnabled(long* pfEnabled);
+        [helpstring("method SetInterestRange")]
+        HRESULT _stdcall SetInterestRange(
+                        int64 Start, 
+                        int64 Stop);
+        [helpstring("method GetDuration")]
+        HRESULT _stdcall GetDuration(int64* pDuration);
+        [helpstring("method GetDuration2")]
+        HRESULT _stdcall GetDuration2(double* pDuration);
+        [helpstring("method SetDefaultFPS")]
+        HRESULT _stdcall SetDefaultFPS(double FPS);
+        [helpstring("method GetDefaultFPS")]
+        HRESULT _stdcall GetDefaultFPS(double* pFPS);
+        [helpstring("method IsDirty")]
+        HRESULT _stdcall IsDirty(long* pDirty);
+        [helpstring("method GetDirtyRange")]
+        HRESULT _stdcall GetDirtyRange(
+                        int64* pStart, 
+                        int64* pStop);
+        [helpstring("method GetCountOfType")]
+        HRESULT _stdcall GetCountOfType(
+                        long Group, 
+                        long* pVal, 
+                        long* pValWithComps, 
+                        TIMELINE_MAJOR_TYPE majortype);
+        HRESULT _stdcall ValidateSourceNames(
+                        long ValidateFlags, 
+                        IMediaLocator* pOverride, 
+                        LONG_PTR NotifyEventHandle);
+        HRESULT _stdcall SetDefaultTransition(GUID* pGuid);
+        HRESULT _stdcall GetDefaultTransition(GUID* pGuid);
+        HRESULT _stdcall SetDefaultEffect(GUID* pGuid);
+        HRESULT _stdcall GetDefaultEffect(GUID* pGuid);
+        HRESULT _stdcall SetDefaultTransitionB(BSTR pGuid);
+        HRESULT _stdcall GetDefaultTransitionB([out, retval] BSTR* pGuid);
+        HRESULT _stdcall SetDefaultEffectB(BSTR pGuid);
+        HRESULT _stdcall GetDefaultEffectB([out, retval] BSTR* pGuid);
+    };
+
+    [
+      odl,
+      uuid(78530B77-61F9-11D2-8CAD-00A024580902),
+      helpstring("IAMTimelineObj Interface")
+    ]
+    interface IAMTimelineObj : IUnknown {
+        [helpstring("method GetStartStop")]
+        HRESULT _stdcall GetStartStop(
+                        int64* pStart, 
+                        int64* pStop);
+        [helpstring("method GetStartStop2")]
+        HRESULT _stdcall GetStartStop2(
+                        double* pStart, 
+                        double* pStop);
+        [helpstring("method FixTimes")]
+        HRESULT _stdcall FixTimes(
+                        int64* pStart, 
+                        int64* pStop);
+        [helpstring("method FixTimes2")]
+        HRESULT _stdcall FixTimes2(
+                        double* pStart, 
+                        double* pStop);
+        [helpstring("method SetStartStop")]
+        HRESULT _stdcall SetStartStop(
+                        int64 Start, 
+                        int64 Stop);
+        [helpstring("method SetStartStop2")]
+        HRESULT _stdcall SetStartStop2(
+                        double Start, 
+                        double Stop);
+        [helpstring("method GetPropertySetter")]
+        HRESULT _stdcall GetPropertySetter([out, retval] IPropertySetter** pVal);
+        [helpstring("method SetPropertySetter")]
+        HRESULT _stdcall SetPropertySetter(IPropertySetter* newVal);
+        [helpstring("method GetSubObject")]
+        HRESULT _stdcall GetSubObject([out, retval] IUnknown** pVal);
+        [helpstring("method SetSubObject")]
+        HRESULT _stdcall SetSubObject(IUnknown* newVal);
+        [helpstring("method SetSubObjectGUID")]
+        HRESULT _stdcall SetSubObjectGUID(GUID newVal);
+        [helpstring("method SetSubObjectGUIDByBSTR")]
+        HRESULT _stdcall SetSubObjectGUIDB(BSTR newVal);
+        [helpstring("method GetSubObjectGUID")]
+        HRESULT _stdcall GetSubObjectGUID(GUID* pVal);
+        [helpstring("method GetSubObjectGUIDByBSTR")]
+        HRESULT _stdcall GetSubObjectGUIDB([out, retval] BSTR* pVal);
+        [helpstring("method GetSubObjectLoaded")]
+        HRESULT _stdcall GetSubObjectLoaded(long* pVal);
+        [helpstring("method GetTimelineType")]
+        HRESULT _stdcall GetTimelineType(TIMELINE_MAJOR_TYPE* pVal);
+        [helpstring("method SetTimelineType")]
+        HRESULT _stdcall SetTimelineType(TIMELINE_MAJOR_TYPE newVal);
+        [helpstring("method GetUserID")]
+        HRESULT _stdcall GetUserID(long* pVal);
+        [helpstring("method SetUserID")]
+        HRESULT _stdcall SetUserID(long newVal);
+        [helpstring("method GetGenID")]
+        HRESULT _stdcall GetGenID(long* pVal);
+        [helpstring("method GetUserName")]
+        HRESULT _stdcall GetUserName([out, retval] BSTR* pVal);
+        [helpstring("method SetUserName")]
+        HRESULT _stdcall SetUserName(BSTR newVal);
+        [helpstring("method GetUserData")]
+        HRESULT _stdcall GetUserData(
+                        unsigned char* pData, 
+                        long* pSize);
+        [helpstring("method SetUserData")]
+        HRESULT _stdcall SetUserData(
+                        unsigned char* pData, 
+                        long Size);
+        [helpstring("method GetMuted")]
+        HRESULT _stdcall GetMuted(long* pVal);
+        [helpstring("method SetMuted")]
+        HRESULT _stdcall SetMuted(long newVal);
+        [helpstring("method GetLocked")]
+        HRESULT _stdcall GetLocked(long* pVal);
+        [helpstring("method SetLocked")]
+        HRESULT _stdcall SetLocked(long newVal);
+        [helpstring("method GetDirtyRange")]
+        HRESULT _stdcall GetDirtyRange(
+                        int64* pStart, 
+                        int64* pStop);
+        [helpstring("method GetDirtyRange")]
+        HRESULT _stdcall GetDirtyRange2(
+                        double* pStart, 
+                        double* pStop);
+        [helpstring("method SetDirtyRange")]
+        HRESULT _stdcall SetDirtyRange(
+                        int64 Start, 
+                        int64 Stop);
+        [helpstring("method SetDirtyRange")]
+        HRESULT _stdcall SetDirtyRange2(
+                        double Start, 
+                        double Stop);
+        [helpstring("method ClearDirty")]
+        HRESULT _stdcall ClearDirty();
+        [helpstring("method Remove")]
+        HRESULT _stdcall Remove();
+        [helpstring("method RemoveAll")]
+        HRESULT _stdcall RemoveAll();
+        HRESULT _stdcall GetTimelineNoRef(IAMTimeline** ppResult);
+        HRESULT _stdcall GetGroupIBelongTo([out] IAMTimelineGroup** ppGroup);
+        HRESULT _stdcall GetEmbedDepth(long* pVal);
+    };
+
+    [
+      odl,
+      uuid(AE9472BD-B0C3-11D2-8D24-00A0C9441E20),
+      helpstring("IPropertySetter Interface")
+    ]
+    interface IPropertySetter : IUnknown {
+        HRESULT _stdcall LoadXML([in] IUnknown* pxml);
+        HRESULT _stdcall PrintXML(
+                        [out] unsigned char* pszXML, 
+                        [in] int cbXML, 
+                        [out] int* pcbPrinted, 
+                        [in] int indent);
+        HRESULT _stdcall CloneProps(
+                        [out] IPropertySetter** ppSetter, 
+                        [in] int64 rtStart, 
+                        [in] int64 rtStop);
+        HRESULT _stdcall AddProp(
+                        [in] DEXTER_PARAM Param, 
+                        [in] DEXTER_VALUE* paValue);
+        HRESULT _stdcall GetProps(
+                        [out] long* pcParams, 
+                        [out] DEXTER_PARAM** paParam, 
+                        [out] DEXTER_VALUE** paValue);
+        HRESULT _stdcall FreeProps(
+                        [in] long cParams, 
+                        [in] DEXTER_PARAM* paParam, 
+                        [in] DEXTER_VALUE* paValue);
+        HRESULT _stdcall ClearProps();
+        HRESULT _stdcall SaveToBlob(
+                        [out] long* pcSize, 
+                        [out] unsigned char** ppb);
+        HRESULT _stdcall LoadFromBlob(
+                        [in] long cSize, 
+                        [in] unsigned char* pb);
+        HRESULT _stdcall SetProps(
+                        [in] IUnknown* pTarget, 
+                        [in] int64 rtNow);
+        HRESULT _stdcall PrintXMLW(
+                        [out] unsigned short* pszXML, 
+                        [in] int cchXML, 
+                        [out] int* pcchPrinted, 
+                        [in] int indent);
+    };
+
+    typedef enum {
+        TIMELINE_MAJOR_TYPE_COMPOSITE = 1,
+        TIMELINE_MAJOR_TYPE_TRACK = 2,
+        TIMELINE_MAJOR_TYPE_SOURCE = 4,
+        TIMELINE_MAJOR_TYPE_TRANSITION = 8,
+        TIMELINE_MAJOR_TYPE_EFFECT = 16,
+        TIMELINE_MAJOR_TYPE_GROUP = 128
+    } __MIDL___MIDL_itf_qedit_0000_0007;
+
+    [
+      odl,
+      uuid(9EED4F00-B8A6-11D2-8023-00C0DF10D434),
+      helpstring("IAMTimelineGroup Interface")
+    ]
+    interface IAMTimelineGroup : IUnknown {
+        [helpstring("method SetTimeline")]
+        HRESULT _stdcall SetTimeline(IAMTimeline* pTimeline);
+        [helpstring("method GetTimeline")]
+        HRESULT _stdcall GetTimeline([out] IAMTimeline** ppTimeline);
+        [helpstring("method GetPriority")]
+        HRESULT _stdcall GetPriority(long* pPriority);
+        [helpstring("method GetMediaType")]
+        HRESULT _stdcall GetMediaType([out] _AMMediaType* __MIDL_0043);
+        [helpstring("method SetMediaType")]
+        HRESULT _stdcall SetMediaType([in] _AMMediaType* __MIDL_0044);
+        [helpstring("method SetOutputFPS")]
+        HRESULT _stdcall SetOutputFPS(double FPS);
+        [helpstring("method GetOutputFPS")]
+        HRESULT _stdcall GetOutputFPS(double* pFPS);
+        [helpstring("method SetGroupName")]
+        HRESULT _stdcall SetGroupName(BSTR pGroupName);
+        [helpstring("method GetGroupName")]
+        HRESULT _stdcall GetGroupName([out, retval] BSTR* pGroupName);
+        [helpstring("method SetPreviewMode")]
+        HRESULT _stdcall SetPreviewMode(long fPreview);
+        [helpstring("method GetPreviewMode")]
+        HRESULT _stdcall GetPreviewMode(long* pfPreview);
+        [helpstring("method SetMediaTypeForVB")]
+        HRESULT _stdcall SetMediaTypeForVB([in] long Val);
+        [helpstring("method GetOutputBuffering")]
+        HRESULT _stdcall GetOutputBuffering([out] int* pnBuffer);
+        [helpstring("method SetOutputBuffering")]
+        HRESULT _stdcall SetOutputBuffering([in] int nBuffer);
+        HRESULT _stdcall SetSmartRecompressFormat(long* pFormat);
+        HRESULT _stdcall GetSmartRecompressFormat(long** ppFormat);
+        HRESULT _stdcall IsSmartRecompressFormatSet(long* pVal);
+        HRESULT _stdcall IsRecompressFormatDirty(long* pVal);
+        HRESULT _stdcall ClearRecompressFormatDirty();
+        HRESULT _stdcall SetRecompFormatFromSource(IAMTimelineSrc* pSource);
+    };
+
+    [
+      odl,
+      uuid(78530B79-61F9-11D2-8CAD-00A024580902),
+      helpstring("IAMTimelineSrc Interface")
+    ]
+    interface IAMTimelineSrc : IUnknown {
+        [helpstring("method GetMediaTimes")]
+        HRESULT _stdcall GetMediaTimes(
+                        int64* pStart, 
+                        int64* pStop);
+        [helpstring("method GetMediaTimes2")]
+        HRESULT _stdcall GetMediaTimes2(
+                        double* pStart, 
+                        double* pStop);
+        [helpstring("method ModifyStopTime")]
+        HRESULT _stdcall ModifyStopTime(int64 Stop);
+        [helpstring("method ModifyStopTime2")]
+        HRESULT _stdcall ModifyStopTime2(double Stop);
+        [helpstring("method FixMediaTimes")]
+        HRESULT _stdcall FixMediaTimes(
+                        int64* pStart, 
+                        int64* pStop);
+        [helpstring("method FixMediaTimes2")]
+        HRESULT _stdcall FixMediaTimes2(
+                        double* pStart, 
+                        double* pStop);
+        [helpstring("method SetMediaTimes")]
+        HRESULT _stdcall SetMediaTimes(
+                        int64 Start, 
+                        int64 Stop);
+        [helpstring("method SetMediaTimes2")]
+        HRESULT _stdcall SetMediaTimes2(
+                        double Start, 
+                        double Stop);
+        [helpstring("method SetMediaLength")]
+        HRESULT _stdcall SetMediaLength(int64 Length);
+        [helpstring("method SetMediaLength2")]
+        HRESULT _stdcall SetMediaLength2(double Length);
+        [helpstring("method GetMediaLength")]
+        HRESULT _stdcall GetMediaLength(int64* pLength);
+        [helpstring("method GetMediaLength2")]
+        HRESULT _stdcall GetMediaLength2(double* pLength);
+        [helpstring("method GetMediaName")]
+        HRESULT _stdcall GetMediaName([out, retval] BSTR* pVal);
+        [helpstring("method SetMediaName")]
+        HRESULT _stdcall SetMediaName(BSTR newVal);
+        [helpstring("method SpliceWithNext")]
+        HRESULT _stdcall SpliceWithNext(IAMTimelineObj* pNext);
+        [helpstring("method GetStreamNumber")]
+        HRESULT _stdcall GetStreamNumber(long* pVal);
+        [helpstring("method SetStreamNumber")]
+        HRESULT _stdcall SetStreamNumber(long Val);
+        HRESULT _stdcall IsNormalRate(long* pVal);
+        [helpstring("method GetDefaultFPS")]
+        HRESULT _stdcall GetDefaultFPS(double* pFPS);
+        [helpstring("method SetDefaultFPS")]
+        HRESULT _stdcall SetDefaultFPS(double FPS);
+        [helpstring("method GetStretchMode")]
+        HRESULT _stdcall GetStretchMode(int* pnStretchMode);
+        [helpstring("method SetStretchMode")]
+        HRESULT _stdcall SetStretchMode(int nStretchMode);
+    };
+
+    [
+      odl,
+      uuid(288581E0-66CE-11D2-918F-00C0DF10D434),
+      helpstring("IMediaLocator Interface")
+    ]
+    interface IMediaLocator : IUnknown {
+        HRESULT _stdcall FindMediaFile(
+                        BSTR Input, 
+                        BSTR FilterString, 
+                        BSTR* pOutput, 
+                        long Flags);
+        HRESULT _stdcall AddFoundLocation(BSTR DirectoryName);
+    };
+
+    typedef [public]
+    long LONG_PTR;
+
+
+    [
+      odl,
+      uuid(963566DA-BE21-4EAF-88E9-35704F8F52A1),
+      helpstring("IAMSetErrorLog Interface")
+    ]
+    interface IAMSetErrorLog : IUnknown {
+        [propget, helpstring("property ErrorLog")]
+        HRESULT _stdcall ErrorLog([out, retval] IAMErrorLog** pVal);
+        [propput, helpstring("property ErrorLog")]
+        HRESULT _stdcall ErrorLog([in] IAMErrorLog* pVal);
+    };
+
+    [
+      odl,
+      uuid(E43E73A2-0EFA-11D3-9601-00A0C9441E20),
+      helpstring("IAMErrorLog Interface")
+    ]
+    interface IAMErrorLog : IUnknown {
+        [helpstring("method LogError")]
+        HRESULT _stdcall LogError(
+                        long Severity, 
+                        BSTR pErrorString, 
+                        long ErrorCode, 
+                        long hresult, 
+                        [in] VARIANT* pExtraInfo);
+    };
+
+    [
+      uuid(78530B78-61F9-11D2-8CAD-00A024580902),
+      helpstring("IAMTimelineObj Class")
+    ]
+    coclass AMTimelineObj {
+        [default] interface IAMTimelineObj;
+    };
+
+    [
+      uuid(78530B7A-61F9-11D2-8CAD-00A024580902),
+      helpstring("IAMTimelineSrc Class")
+    ]
+    coclass AMTimelineSrc {
+        [default] interface IAMTimelineSrc;
+        interface IAMTimelineObj;
+        interface IAMTimelineEffectable;
+        interface IAMTimelineSplittable;
+    };
+
+    [
+      odl,
+      uuid(EAE58537-622E-11D2-8CAD-00A024580902),
+      helpstring("IAMTimelineEffectable Interface")
+    ]
+    interface IAMTimelineEffectable : IUnknown {
+        [helpstring("method EffectInsBefore")]
+        HRESULT _stdcall EffectInsBefore(
+                        IAMTimelineObj* pFX, 
+                        long priority);
+        [helpstring("method EffectSwapPriorities")]
+        HRESULT _stdcall EffectSwapPriorities(
+                        long PriorityA, 
+                        long PriorityB);
+        [helpstring("method EffectGetCount")]
+        HRESULT _stdcall EffectGetCount(long* pCount);
+        [helpstring("method GetEffect")]
+        HRESULT _stdcall GetEffect(
+                        [out] IAMTimelineObj** ppFx, 
+                        long Which);
+    };
+
+    [
+      odl,
+      uuid(A0F840A0-D590-11D2-8D55-00A0C9441E20),
+      helpstring("IAMTimelineSplittable Interface")
+    ]
+    interface IAMTimelineSplittable : IUnknown {
+        HRESULT _stdcall SplitAt(int64 Time);
+        HRESULT _stdcall SplitAt2(double Time);
+    };
+
+    [
+      uuid(8F6C3C50-897B-11D2-8CFB-00A0C9441E20)
+    ]
+    coclass AMTimelineTrack {
+        [default] interface IAMTimelineTrack;
+        interface IAMTimelineObj;
+        interface IAMTimelineEffectable;
+        interface IAMTimelineTransable;
+        interface IAMTimelineVirtualTrack;
+        interface IAMTimelineSplittable;
+    };
+
+    [
+      odl,
+      uuid(EAE58538-622E-11D2-8CAD-00A024580902),
+      helpstring("IAMTimelineTrack Interface")
+    ]
+    interface IAMTimelineTrack : IUnknown {
+        [helpstring("method SrcAdd")]
+        HRESULT _stdcall SrcAdd(IAMTimelineObj* pSource);
+        [helpstring("method GetNextSrc")]
+        HRESULT _stdcall GetNextSrc(
+                        [out] IAMTimelineObj** ppSrc, 
+                        int64* pInOut);
+        [helpstring("method GetNextSrc2")]
+        HRESULT _stdcall GetNextSrc2(
+                        [out] IAMTimelineObj** ppSrc, 
+                        double* pInOut);
+        [helpstring("method MoveEverythingBy")]
+        HRESULT _stdcall MoveEverythingBy(
+                        int64 Start, 
+                        int64 MoveBy);
+        [helpstring("method MoveEverythingBy2")]
+        HRESULT _stdcall MoveEverythingBy2(
+                        double Start, 
+                        double MoveBy);
+        [helpstring("method GetSourcesCount")]
+        HRESULT _stdcall GetSourcesCount(long* pVal);
+        [helpstring("method AreYouBlank")]
+        HRESULT _stdcall AreYouBlank(long* pVal);
+        [helpstring("method GetSrcAtTime")]
+        HRESULT _stdcall GetSrcAtTime(
+                        [out] IAMTimelineObj** ppSrc, 
+                        int64 Time, 
+                        long SearchDirection);
+        [helpstring("method GetSrcAtTime2")]
+        HRESULT _stdcall GetSrcAtTime2(
+                        [out] IAMTimelineObj** ppSrc, 
+                        double Time, 
+                        long SearchDirection);
+        HRESULT _stdcall InsertSpace(
+                        int64 rtStart, 
+                        int64 rtEnd);
+        HRESULT _stdcall InsertSpace2(
+                        double rtStart, 
+                        double rtEnd);
+        HRESULT _stdcall ZeroBetween(
+                        int64 rtStart, 
+                        int64 rtEnd);
+        HRESULT _stdcall ZeroBetween2(
+                        double rtStart, 
+                        double rtEnd);
+        HRESULT _stdcall GetNextSrcEx(
+                        IAMTimelineObj* pLast, 
+                        [out] IAMTimelineObj** ppNext);
+    };
+
+    [
+      odl,
+      uuid(378FA386-622E-11D2-8CAD-00A024580902),
+      helpstring("IAMTimelineTransable Interface")
+    ]
+    interface IAMTimelineTransable : IUnknown {
+        [helpstring("method TransAdd")]
+        HRESULT _stdcall TransAdd(IAMTimelineObj* pTrans);
+        [helpstring("method TransGetCount")]
+        HRESULT _stdcall TransGetCount(long* pCount);
+        [helpstring("method GetNextTrans")]
+        HRESULT _stdcall GetNextTrans(
+                        [out] IAMTimelineObj** ppTrans, 
+                        int64* pInOut);
+        [helpstring("method GetNextTrans2")]
+        HRESULT _stdcall GetNextTrans2(
+                        [out] IAMTimelineObj** ppTrans, 
+                        double* pInOut);
+        [helpstring("method GetTransAtTime")]
+        HRESULT _stdcall GetTransAtTime(
+                        [out] IAMTimelineObj** ppObj, 
+                        int64 Time, 
+                        long SearchDirection);
+        [helpstring("method GetTransAtTime2")]
+        HRESULT _stdcall GetTransAtTime2(
+                        [out] IAMTimelineObj** ppObj, 
+                        double Time, 
+                        long SearchDirection);
+    };
+
+    [
+      odl,
+      uuid(A8ED5F80-C2C7-11D2-8D39-00A0C9441E20),
+      helpstring("IAMTimelineVirtualTrack Interface")
+    ]
+    interface IAMTimelineVirtualTrack : IUnknown {
+        [helpstring("method TrackGetPriority")]
+        HRESULT _stdcall TrackGetPriority(long* pPriority);
+        [helpstring("method SetTrackDirty")]
+        HRESULT _stdcall SetTrackDirty();
+    };
+
+    [
+      uuid(74D2EC80-6233-11D2-8CAD-00A024580902)
+    ]
+    coclass AMTimelineComp {
+        [default] interface IAMTimelineComp;
+        interface IAMTimelineObj;
+        interface IAMTimelineEffectable;
+        interface IAMTimelineTransable;
+        interface IAMTimelineVirtualTrack;
+    };
+
+    [
+      odl,
+      uuid(EAE58536-622E-11D2-8CAD-00A024580902),
+      helpstring("IAMTimelineComp Interface")
+    ]
+    interface IAMTimelineComp : IUnknown {
+        [helpstring("method VTrackInsBefore")]
+        HRESULT _stdcall VTrackInsBefore(
+                        IAMTimelineObj* pVirtualTrack, 
+                        long priority);
+        [helpstring("method VTrackSwapPriorities")]
+        HRESULT _stdcall VTrackSwapPriorities(
+                        long VirtualTrackA, 
+                        long VirtualTrackB);
+        [helpstring("method VTrackGetCount")]
+        HRESULT _stdcall VTrackGetCount(long* pVal);
+        [helpstring("method GetVTrack")]
+        HRESULT _stdcall GetVTrack(
+                        [out] IAMTimelineObj** ppVirtualTrack, 
+                        long Which);
+        [helpstring("method GetCountOfType")]
+        HRESULT _stdcall GetCountOfType(
+                        long* pVal, 
+                        long* pValWithComps, 
+                        TIMELINE_MAJOR_TYPE majortype);
+        [helpstring("method GetRecursiveLayerOfType")]
+        HRESULT _stdcall GetRecursiveLayerOfType(
+                        [out] IAMTimelineObj** ppVirtualTrack, 
+                        long WhichLayer, 
+                        TIMELINE_MAJOR_TYPE Type);
+        [helpstring("method GetRecursiveLayerOfTypeI (do not call)")]
+        HRESULT _stdcall GetRecursiveLayerOfTypeI(
+                        [out] IAMTimelineObj** ppVirtualTrack, 
+                        [in, out] long* pWhichLayer, 
+                        TIMELINE_MAJOR_TYPE Type);
+        HRESULT _stdcall GetNextVTrack(
+                        IAMTimelineObj* pVirtualTrack, 
+                        [out] IAMTimelineObj** ppNextVirtualTrack);
+    };
+
+    [
+      uuid(F6D371E1-B8A6-11D2-8023-00C0DF10D434)
+    ]
+    coclass AMTimelineGroup {
+        [default] interface IAMTimelineGroup;
+        interface IAMTimelineComp;
+        interface IAMTimelineObj;
+    };
+
+    [
+      uuid(74D2EC81-6233-11D2-8CAD-00A024580902)
+    ]
+    coclass AMTimelineTrans {
+        [default] interface IAMTimelineTrans;
+        interface IAMTimelineObj;
+        interface IAMTimelineSplittable;
+    };
+
+    [
+      odl,
+      uuid(BCE0C265-622D-11D2-8CAD-00A024580902),
+      helpstring("IAMTimelineTrans Interface")
+    ]
+    interface IAMTimelineTrans : IUnknown {
+        [helpstring("method GetCutPoint")]
+        HRESULT _stdcall GetCutPoint(int64* pTLTime);
+        [helpstring("method GetCutPoint2")]
+        HRESULT _stdcall GetCutPoint2(double* pTLTime);
+        [helpstring("method SetCutPoint")]
+        HRESULT _stdcall SetCutPoint(int64 TLTime);
+        [helpstring("method SetCutPoint2")]
+        HRESULT _stdcall SetCutPoint2(double TLTime);
+        [helpstring("method GetSwapInputs")]
+        HRESULT _stdcall GetSwapInputs(long* pVal);
+        [helpstring("method SetSwapInputs")]
+        HRESULT _stdcall SetSwapInputs(long pVal);
+        [helpstring("method GetCutsOnly")]
+        HRESULT _stdcall GetCutsOnly(long* pVal);
+        [helpstring("method SetCutsOnly")]
+        HRESULT _stdcall SetCutsOnly(long pVal);
+    };
+
+    [
+      uuid(74D2EC82-6233-11D2-8CAD-00A024580902)
+    ]
+    coclass AMTimelineEffect {
+        [default] interface IAMTimelineEffect;
+        interface IAMTimelineObj;
+        interface IAMTimelineSplittable;
+        interface IPropertyBag;
+    };
+
+    [
+      odl,
+      uuid(BCE0C264-622D-11D2-8CAD-00A024580902),
+      helpstring("IAMTimelineEffect Interface")
+    ]
+    interface IAMTimelineEffect : IUnknown {
+        [helpstring("method EffectGetPriority")]
+        HRESULT _stdcall EffectGetPriority(long* pVal);
+    };
+    [
+      uuid(64D8A8E0-80A2-11D2-8CF3-00A0C9441E20)
+    ]
+    coclass RenderEngine {
+        [default] interface IRenderEngine;
+        interface IRenderEngine2;
+        interface IAMSetErrorLog;
+    };
+
+    [
+      odl,
+      uuid(6BEE3A81-66C9-11D2-918F-00C0DF10D434),
+      helpstring("IRenderEngine Interface")
+    ]
+    interface IRenderEngine : IUnknown {
+        HRESULT _stdcall SetTimelineObject(IAMTimeline* pTimeline);
+        HRESULT _stdcall GetTimelineObject([out] IAMTimeline** ppTimeline);
+        HRESULT _stdcall GetFilterGraph([out] IGraphBuilder** ppFG);
+        HRESULT _stdcall SetFilterGraph(IGraphBuilder* pFG);
+        HRESULT _stdcall SetInterestRange(
+                        int64 Start, 
+                        int64 Stop);
+        HRESULT _stdcall SetInterestRange2(
+                        double Start, 
+                        double Stop);
+        HRESULT _stdcall SetRenderRange(
+                        int64 Start, 
+                        int64 Stop);
+        HRESULT _stdcall SetRenderRange2(
+                        double Start, 
+                        double Stop);
+        HRESULT _stdcall GetGroupOutputPin(
+                        long Group, 
+                        [out] IPin** ppRenderPin);
+        HRESULT _stdcall ScrapIt();
+        HRESULT _stdcall RenderOutputPins();
+        HRESULT _stdcall GetVendorString([out, retval] BSTR* pVendorID);
+        HRESULT _stdcall ConnectFrontEnd();
+        HRESULT _stdcall SetSourceConnectCallback(IGrfCache* pCallback);
+        HRESULT _stdcall SetDynamicReconnectLevel(long Level);
+        HRESULT _stdcall DoSmartRecompression();
+        HRESULT _stdcall UseInSmartRecompressionGraph();
+        HRESULT _stdcall SetSourceNameValidation(
+                        BSTR FilterString, 
+                        IMediaLocator* pOverride, 
+                        long Flags);
+        HRESULT _stdcall Commit();
+        HRESULT _stdcall Decommit();
+        HRESULT _stdcall GetCaps(
+                        long Index, 
+                        long* pReturn);
+    };
+
+    typedef [public]
+    unsigned long ULONG_PTR;
+    
+
+    [
+      odl,
+      uuid(AE9472BE-B0C3-11D2-8D24-00A0C9441E20),
+      helpstring("IGrfCache Interface")
+    ]
+    interface IGrfCache : IDispatch {
+        [helpstring("method AddFilter")]
+        HRESULT _stdcall AddFilter(
+                        IGrfCache* ChainedCache, 
+                        int64 Id, 
+                        IBaseFilter* pFilter, 
+                        LPWSTR pName);
+        [helpstring("method ConnectPins")]
+        HRESULT _stdcall ConnectPins(
+                        IGrfCache* ChainedCache, 
+                        int64 PinID1, 
+                        IPin* pPin1, 
+                        int64 PinID2, 
+                        IPin* pPin2);
+        [helpstring("method SetGraph")]
+        HRESULT _stdcall SetGraph(IGraphBuilder* pGraph);
+        [helpstring("method DoConnectionsNow")]
+        HRESULT _stdcall DoConnectionsNow();
+    };
+
+    [
+      odl,
+      uuid(6BEE3A82-66C9-11D2-918F-00C0DF10D434),
+      helpstring("IRenderEngine2 Interface")
+    ]
+    interface IRenderEngine2 : IUnknown {
+        HRESULT _stdcall SetResizerGUID(GUID ResizerGuid);
+    };
+
+    [
+      uuid(498B0949-BBE9-4072-98BE-6CCAEB79DC6F)
+    ]
+    coclass SmartRenderEngine {
+        [default] interface IRenderEngine;
+        interface ISmartRenderEngine;
+        interface IAMSetErrorLog;
+    };
+
+    [
+      odl,
+      uuid(F03FA8CE-879A-4D59-9B2C-26BB1CF83461),
+      helpstring("ISmartRenderEngine Interface")
+    ]
+    interface ISmartRenderEngine : IUnknown {
+        HRESULT _stdcall SetGroupCompressor(
+                        long Group, 
+                        IBaseFilter* pCompressor);
+        HRESULT _stdcall GetGroupCompressor(
+                        long Group, 
+                        IBaseFilter** pCompressor);
+        HRESULT _stdcall SetFindCompressorCB(IFindCompressorCB* pCallback);
+    };
+
+    [
+      odl,
+      uuid(F03FA8DE-879A-4D59-9B2C-26BB1CF83461),
+      helpstring("IFindCompressorCB Interface")
+    ]
+    interface IFindCompressorCB : IUnknown {
+        HRESULT _stdcall GetCompressor(
+                        _AMMediaType* pType, 
+                        _AMMediaType* pCompType, 
+                        [out] IBaseFilter** ppFilter);
+    };
+
+    [
+      uuid(036A9790-C153-11D2-9EF7-006008039E37)
+    ]
+    coclass AudMixer {
+        [default] interface IBaseFilter;
+    };
+
+    [
+      uuid(18C628EE-962A-11D2-8D08-00A0C9441E20),
+      helpstring("Xml2Dex Class")
+    ]
+    coclass Xml2Dex {
+        [default] interface IXml2Dex;
+    };
+
+    [
+      odl,
+      uuid(18C628ED-962A-11D2-8D08-00A0C9441E20),
+      helpstring("IXml2Dex Interface")
+    ]
+    interface IXml2Dex : IDispatch {
+        [helpstring("method CreateGraphFromFile")]
+        HRESULT _stdcall CreateGraphFromFile(
+                        [out] IUnknown** ppGraph, 
+                        IUnknown* pTimeline, 
+                        BSTR Filename);
+        [helpstring("method WriteGrfFile")]
+        HRESULT _stdcall WriteGrfFile(
+                        IUnknown* pGraph, 
+                        BSTR Filename);
+        [helpstring("method WriteXMLFile")]
+        HRESULT _stdcall WriteXMLFile(
+                        IUnknown* pTimeline, 
+                        BSTR Filename);
+        [helpstring("method ReadXMLFile")]
+        HRESULT _stdcall ReadXMLFile(
+                        IUnknown* pTimeline, 
+                        BSTR XMLName);
+        [helpstring("method Delete")]
+        HRESULT _stdcall Delete(
+                        IUnknown* pTimeline, 
+                        double dStart, 
+                        double dEnd);
+        [helpstring("method WriteXMLPart")]
+        HRESULT _stdcall WriteXMLPart(
+                        IUnknown* pTimeline, 
+                        double dStart, 
+                        double dEnd, 
+                        BSTR Filename);
+        [helpstring("method PasteXMLFile")]
+        HRESULT _stdcall PasteXMLFile(
+                        IUnknown* pTimeline, 
+                        double dStart, 
+                        BSTR Filename);
+        [helpstring("method CopyXML")]
+        HRESULT _stdcall CopyXML(
+                        IUnknown* pTimeline, 
+                        double dStart, 
+                        double dEnd);
+        [helpstring("method PasteXML")]
+        HRESULT _stdcall PasteXML(
+                        IUnknown* pTimeline, 
+                        double dStart);
+        [helpstring("method Reset")]
+        HRESULT _stdcall Reset();
+        [helpstring("method ReadXML")]
+        HRESULT _stdcall ReadXML(
+                        IUnknown* pTimeline, 
+                        IUnknown* pxml);
+        [helpstring("method WriteXML")]
+        HRESULT _stdcall WriteXML(
+                        IUnknown* pTimeline, 
+                        BSTR* pbstrXML);
+    };
+
+    [
+      uuid(CC1101F2-79DC-11D2-8CE6-00A0C9441E20),
+      helpstring("MediaLocator Class")
+    ]
+    coclass MediaLocator {
+        [default] interface IMediaLocator;
+    };
+
+    [
+      uuid(ADF95821-DED7-11D2-ACBE-0080C75E246E),
+      helpstring("Varying Property Holder")
+    ]
+    coclass PropertySetter {
+        [default] interface IPropertySetter;
+        interface IAMSetErrorLog;
+    };
+
+    [
+      uuid(65BD0711-24D2-4FF7-9324-ED2E5D3ABAFA),
+      helpstring("MediaDet Class")
+    ]
+    coclass MediaDet {
+        [default] interface IMediaDet;
+    };
+
+    [
+      odl,
+      uuid(65BD0710-24D2-4FF7-9324-ED2E5D3ABAFA),
+      helpstring("IMediaDet Interface")
+    ]
+    interface IMediaDet : IUnknown {
+        [propget, helpstring("property Filter")]
+        HRESULT _stdcall Filter([out, retval] IUnknown** pVal);
+        [propput, helpstring("property Filter")]
+        HRESULT _stdcall Filter([in] IUnknown* pVal);
+        [propget, helpstring("property OutputStreams")]
+        HRESULT _stdcall OutputStreams([out, retval] long* pVal);
+        [propget, helpstring("property CurrentStream")]
+        HRESULT _stdcall CurrentStream([out, retval] long* pVal);
+        [propput, helpstring("property CurrentStream")]
+        HRESULT _stdcall CurrentStream([in] long pVal);
+        [propget, helpstring("property StreamType")]
+        HRESULT _stdcall StreamType([out, retval] GUID* pVal);
+        [propget, helpstring("property StreamTypeB")]
+        HRESULT _stdcall StreamTypeB([out, retval] BSTR* pVal);
+        [propget, helpstring("property StreamLength")]
+        HRESULT _stdcall StreamLength([out, retval] double* pVal);
+        [propget, helpstring("property Filename")]
+        HRESULT _stdcall Filename([out, retval] BSTR* pVal);
+        [propput, helpstring("property Filename")]
+        HRESULT _stdcall Filename([in] BSTR pVal);
+        [helpstring("method GetBitmapBits")]
+        HRESULT _stdcall GetBitmapBits(
+                        double streamTime, 
+                        long* pBufferSize, 
+                        unsigned char* pBuffer, 
+                        long Width, 
+                        long Height);
+        [helpstring("method WriteBitmapBits")]
+        HRESULT _stdcall WriteBitmapBits(
+                        double streamTime, 
+                        long Width, 
+                        long Height, 
+                        BSTR Filename);
+        [propget, helpstring("property StreamMediaType")]
+        HRESULT _stdcall StreamMediaType([out, retval] _AMMediaType* pVal);
+        [helpstring("method GetSampleGrabber")]
+        HRESULT _stdcall GetSampleGrabber([out] ISampleGrabber** ppVal);
+        [propget, helpstring("property FrameRate")]
+        HRESULT _stdcall FrameRate([out, retval] double* pVal);
+        [helpstring("method EnterBitmapGrabMode")]
+        HRESULT _stdcall EnterBitmapGrabMode(double SeekTime);
+    };
+
+    [
+      odl,
+      uuid(6B652FFF-11FE-4FCE-92AD-0266B5D7C78F),
+      helpstring("ISampleGrabber Interface")
+    ]
+    interface ISampleGrabber : IUnknown {
+        HRESULT _stdcall SetOneShot(long OneShot);
+        HRESULT _stdcall SetMediaType(_AMMediaType* pType);
+        HRESULT _stdcall GetConnectedMediaType(_AMMediaType* pType);
+        HRESULT _stdcall SetBufferSamples(long BufferThem);
+        HRESULT _stdcall GetCurrentBuffer(
+                        [in, out] long* pBufferSize, 
+                        [out] long* pBuffer);
+        HRESULT _stdcall GetCurrentSample([out, retval] IMediaSample** ppSample);
+        HRESULT _stdcall SetCallback(
+                        ISampleGrabberCB* pCallback, 
+                        long WhichMethodToCallback);
+    };
+
+    [
+      odl,
+      uuid(0579154A-2B53-4994-B0D0-E773148EFF85),
+      helpstring("ISampleGrabberCB Interface")
+    ]
+    interface ISampleGrabberCB : IUnknown {
+        HRESULT _stdcall SampleCB(
+                        double SampleTime, 
+                        [in] IMediaSample* pSample);
+        HRESULT _stdcall BufferCB(
+                        double SampleTime, 
+                        int pBuffer, 
+                        long BufferLen);
+    };
+
+    [
+      uuid(C1F400A0-3F08-11D3-9F0B-006008039E37),
+      helpstring("MsGrab Class")
+    ]
+    coclass SampleGrabber {
+        [default] interface ISampleGrabber;
+        interface IBaseFilter;
+    };
+
+    [
+      uuid(C1F400A4-3F08-11D3-9F0B-006008039E37),
+      helpstring("NullRenderer Class")
+    ]
+    coclass NullRenderer {
+        [default] interface IBaseFilter;
+    };
+
+    [
+      uuid(BB44391D-6ABD-422F-9E2E-385C9DFF51FC),
+      helpstring("DxtCompositor Class")
+    ]
+    coclass DxtCompositor {
+        [default] interface IDxtCompositor;
+    };
+
+    [
+      odl,
+      uuid(BB44391E-6ABD-422F-9E2E-385C9DFF51FC),
+      helpstring("IDxtCompositor Interface"),
+      dual,
+      oleautomation
+    ]
+    interface IDxtCompositor : IDXEffect {
+        [id(0x00000001), propget, helpstring("property OffsetX")]
+        HRESULT OffsetX([out, retval] long* pVal);
+        [id(0x00000001), propput, helpstring("property OffsetX")]
+        HRESULT OffsetX([in] long pVal);
+        [id(0x00000002), propget, helpstring("property OffsetY")]
+        HRESULT OffsetY([out, retval] long* pVal);
+        [id(0x00000002), propput, helpstring("property OffsetY")]
+        HRESULT OffsetY([in] long pVal);
+        [id(0x00000003), propget, helpstring("property Width")]
+        HRESULT Width([out, retval] long* pVal);
+        [id(0x00000003), propput, helpstring("property Width")]
+        HRESULT Width([in] long pVal);
+        [id(0x00000004), propget, helpstring("property Height")]
+        HRESULT Height([out, retval] long* pVal);
+        [id(0x00000004), propput, helpstring("property Height")]
+        HRESULT Height([in] long pVal);
+        [id(0x00000005), propget, helpstring("property SrcOffsetX")]
+        HRESULT SrcOffsetX([out, retval] long* pVal);
+        [id(0x00000005), propput, helpstring("property SrcOffsetX")]
+        HRESULT SrcOffsetX([in] long pVal);
+        [id(0x00000006), propget, helpstring("property SrcOffsetY")]
+        HRESULT SrcOffsetY([out, retval] long* pVal);
+        [id(0x00000006), propput, helpstring("property SrcOffsetY")]
+        HRESULT SrcOffsetY([in] long pVal);
+        [id(0x00000007), propget, helpstring("property SrcWidth")]
+        HRESULT SrcWidth([out, retval] long* pVal);
+        [id(0x00000007), propput, helpstring("property SrcWidth")]
+        HRESULT SrcWidth([in] long pVal);
+        [id(0x00000008), propget, helpstring("property SrcHeight")]
+        HRESULT SrcHeight([out, retval] long* pVal);
+        [id(0x00000008), propput, helpstring("property SrcHeight")]
+        HRESULT SrcHeight([in] long pVal);
+    };
+
+    [
+      odl,
+      uuid(E31FB81B-1335-11D1-8189-0000F87557DB),
+      helpstring("IDXEffect Interface"),
+      dual,
+      oleautomation
+    ]
+    interface IDXEffect : IDispatch {
+        [id(0x00002710), propget]
+        HRESULT Capabilities([out, retval] long* pVal);
+        [id(0x00002711), propget]
+        HRESULT Progress([out, retval] float* pVal);
+        [id(0x00002711), propput]
+        HRESULT Progress([in] float pVal);
+        [id(0x00002712), propget]
+        HRESULT StepResolution([out, retval] float* pVal);
+        [id(0x00002713), propget]
+        HRESULT Duration([out, retval] float* pVal);
+        [id(0x00002713), propput]
+        HRESULT Duration([in] float pVal);
+    };
+
+    [
+      uuid(506D89AE-909A-44F7-9444-ABD575896E35),
+      helpstring("DxtAlphaSetter Class")
+    ]
+    coclass DxtAlphaSetter {
+        [default] interface IDxtAlphaSetter;
+    };
+
+    [
+      odl,
+      uuid(4EE9EAD9-DA4D-43D0-9383-06B90C08B12B),
+      helpstring("IDxtAlphaSetter Interface"),
+      dual,
+      oleautomation
+    ]
+    interface IDxtAlphaSetter : IDXEffect {
+        [id(0x00000001), propget, helpstring("property Alpha")]
+        HRESULT Alpha([out, retval] long* pVal);
+        [id(0x00000001), propput, helpstring("property Alpha")]
+        HRESULT Alpha([in] long pVal);
+        [id(0x00000002), propget, helpstring("property AlphaRamp")]
+        HRESULT AlphaRamp([out, retval] double* pVal);
+        [id(0x00000002), propput, helpstring("property AlphaRamp")]
+        HRESULT AlphaRamp([in] double pVal);
+    };
+
+    [
+      uuid(DE75D012-7A65-11D2-8CEA-00A0C9441E20),
+      helpstring("SMPTE wipe DXT")
+    ]
+    coclass DxtJpeg {
+        [default] interface IDxtJpeg;
+    };
+
+    [
+      odl,
+      uuid(DE75D011-7A65-11D2-8CEA-00A0C9441E20),
+      helpstring("IDxtJpeg Interface"),
+      dual,
+      oleautomation
+    ]
+    interface IDxtJpeg : IDXEffect {
+        [id(0x00000001), propget, helpstring("property MaskNum")]
+        HRESULT MaskNum([out, retval] long* __MIDL_0021);
+        [id(0x00000001), propput, helpstring("property MaskNum")]
+        HRESULT MaskNum([in] long __MIDL_0021);
+        [id(0x00000002), propget, helpstring("property MaskName")]
+        HRESULT MaskName([out, retval] BSTR* pVal);
+        [id(0x00000002), propput, helpstring("property MaskName")]
+        HRESULT MaskName([in] BSTR pVal);
+        [id(0x00000003), propget, helpstring("property ScaleX")]
+        HRESULT ScaleX([out, retval] double* __MIDL_0023);
+        [id(0x00000003), propput, helpstring("property ScaleX")]
+        HRESULT ScaleX([in] double __MIDL_0023);
+        [id(0x00000004), propget, helpstring("property ScaleY")]
+        HRESULT ScaleY([out, retval] double* __MIDL_0025);
+        [id(0x00000004), propput, helpstring("property ScaleY")]
+        HRESULT ScaleY([in] double __MIDL_0025);
+        [id(0x00000005), propget, helpstring("property OffsetX")]
+        HRESULT OffsetX([out, retval] long* __MIDL_0027);
+        [id(0x00000005), propput, helpstring("property OffsetX")]
+        HRESULT OffsetX([in] long __MIDL_0027);
+        [id(0x00000006), propget, helpstring("property OffsetY")]
+        HRESULT OffsetY([out, retval] long* __MIDL_0029);
+        [id(0x00000006), propput, helpstring("property OffsetY")]
+        HRESULT OffsetY([in] long __MIDL_0029);
+        [id(0x00000007), propget, helpstring("property ReplicateX")]
+        HRESULT ReplicateX([out, retval] long* pVal);
+        [id(0x00000007), propput, helpstring("property ReplicateX")]
+        HRESULT ReplicateX([in] long pVal);
+        [id(0x00000008), propget, helpstring("property ReplicateY")]
+        HRESULT ReplicateY([out, retval] long* pVal);
+        [id(0x00000008), propput, helpstring("property ReplicateY")]
+        HRESULT ReplicateY([in] long pVal);
+        [id(0x00000009), propget, helpstring("property BorderColor")]
+        HRESULT BorderColor([out, retval] long* pVal);
+        [id(0x00000009), propput, helpstring("property BorderColor")]
+        HRESULT BorderColor([in] long pVal);
+        [id(0x0000000a), propget, helpstring("property BorderWidth")]
+        HRESULT BorderWidth([out, retval] long* pVal);
+        [id(0x0000000a), propput, helpstring("property BorderWidth")]
+        HRESULT BorderWidth([in] long pVal);
+        [id(0x0000000b), propget, helpstring("property BorderSoftness")]
+        HRESULT BorderSoftness([out, retval] long* pVal);
+        [id(0x0000000b), propput, helpstring("property BorderSoftness")]
+        HRESULT BorderSoftness([in] long pVal);
+        [id(0x60030016)]
+        HRESULT ApplyChanges();
+        [id(0x60030017)]
+        HRESULT LoadDefSettings();
+    };
+
+    [
+      uuid(0CFDD070-581A-11D2-9EE6-006008039E37)
+    ]
+    coclass ColorSource {
+        [default] interface IBaseFilter;
+    };
+
+    [
+      uuid(C5B19592-145E-11D3-9F04-006008039E37),
+      helpstring("DxtKey Class")
+    ]
+    coclass DxtKey {
+        [default] interface IDxtKey;
+    };
+
+    [
+      odl,
+      uuid(3255DE56-38FB-4901-B980-94B438010D7B),
+      helpstring("IDxtKey Interface"),
+      dual,
+      oleautomation
+    ]
+    interface IDxtKey : IDXEffect {
+        [id(0x00000001), propget, helpstring("property KeyType")]
+        HRESULT KeyType([out, retval] int* __MIDL_0031);
+        [id(0x00000001), propput, helpstring("property KeyType")]
+        HRESULT KeyType([in] int __MIDL_0031);
+        [id(0x00000002), propget, helpstring("property Hue")]
+        HRESULT Hue([out, retval] int* __MIDL_0033);
+        [id(0x00000002), propput, helpstring("property Hue")]
+        HRESULT Hue([in] int __MIDL_0033);
+        [id(0x00000003), propget, helpstring("property Luminance")]
+        HRESULT Luminance([out, retval] int* __MIDL_0035);
+        [id(0x00000003), propput, helpstring("property Luminance")]
+        HRESULT Luminance([in] int __MIDL_0035);
+        [id(0x00000004), propget, helpstring("property RGB")]
+        HRESULT RGB([out, retval] unsigned long* __MIDL_0037);
+        [id(0x00000004), propput, helpstring("property RGB")]
+        HRESULT RGB([in] unsigned long __MIDL_0037);
+        [id(0x00000005), propget, helpstring("property Similarity")]
+        HRESULT Similarity([out, retval] int* __MIDL_0039);
+        [id(0x00000005), propput, helpstring("property Similarity")]
+        HRESULT Similarity([in] int __MIDL_0039);
+        [id(0x00000006), propget, helpstring("property Invert")]
+        HRESULT Invert([out, retval] long* __MIDL_0041);
+        [id(0x00000006), propput, helpstring("property Invert")]
+        HRESULT Invert([in] long __MIDL_0041);
+    };
+};
