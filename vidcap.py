@@ -5,6 +5,7 @@ from comtypes.client import CreateObject
 from comtypes import CoClass
 from comtypes.gen.DirectShowLib import (FilterGraph, CaptureGraphBuilder2,
 	ICreateDevEnum, typelib_path, IBaseFilter, IBindCtx, IMoniker)
+from comtypes.gen.DexterLib import (SampleGrabber,)
 
 class error(Exception):
 	pass
@@ -18,12 +19,6 @@ class DeviceEnumerator(CoClass):
 	_idlflags_ = []
 	_typelib_path_ = typelib_path
 	_reg_typelib_ = ('{24BC6711-3881-420F-8299-34DA1026D31E}', 1, 0)
-
-CLSID_SampleGrabber = GUID('{A000F4C1-083F-D311-9F0B-006008039E37}')
-class SampleGrabber(CoClass):
-	_reg_clsid_ = CLSID_SampleGrabber
-	_com_interfaces_ = [IBaseFilter, ISampleGrabber]
-	# ...
 
 class Device(object):
 	def __init__(self, devnum=0, show_video_window=False):
@@ -50,8 +45,8 @@ class Device(object):
 		
 		self.filter_graph.AddFilter(filter_ob, "VideoCapture")
 		
-		# self.grabber = CreateObject(SampleGrabber)
-		#self.filter_graph.AddFilter(self.grabber, "Grabber")
+		self.grabber = CreateObject(SampleGrabber)
+		self.filter_graph.AddFilter(self.grabber, "Grabber")
 
 def test():
 	d = Device()
