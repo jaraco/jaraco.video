@@ -1,13 +1,25 @@
 
+"""
+VidCap.py
+
+(c) 2009 Jason R. Coombs
+
+A port of the C++ extension-based version by ___
+
+"""
+
 from comtypes import POINTER
 from comtypes import GUID, CLSCTX_INPROC
 from comtypes.client import CreateObject
-from comtypes import CoClass
+from comtypes import CoClass, IUnknown
+from ctypes import cast, POINTER, Structure, c_longlong
+from ctypes.wintypes import (RECT, DWORD, LONG, WORD, ULONG, HWND,
+	UINT, LPCOLESTR, LCID, LPVOID)
+from ctypes import windll
+
 from comtypes.gen.DirectShowLib import (FilterGraph, CaptureGraphBuilder2,
 	ICreateDevEnum, typelib_path, IBaseFilter, IBindCtx, IMoniker)
 from comtypes.gen.DexterLib import (SampleGrabber, tag_AMMediaType)
-from ctypes import cast, POINTER, Structure, c_longlong
-from ctypes.wintypes import RECT, DWORD, LONG, WORD
 
 class error(Exception):
 	pass
@@ -68,6 +80,32 @@ class VIDEOINFOHEADER(Structure):
 		('bmi_header', BITMAPINFOHEADER),
 	)
 
+class CAUUID(Structure):
+	_fields_ = (
+		('element_count', ULONG),
+		('elements', POINTER(GUID)),
+		)
+
+LPUNKNOWN = POINTER(IUnknown)
+CLSID = GUID
+LPCLSID = POINTER(CLSID)
+
+OleCreatePropertyFrame = windll.oleaut32.OleCreatePropertyFrame
+OleCreatePropertyFrame.restype = HRESULT
+OleCreatePropertyFrame.argtypes = (
+	HWND, # [in] hwndOwner
+	UINT, # [in] x
+	UINT, # [in] y
+	LPCOLESTR, # [in] lpszCaption
+	ULONG, # [in] cObjects
+	POINTER(LPUNKNOWN), # [in] ppUnk
+	ULONG, # [in] cPages
+	LPCLSID, # [in] pPageClsID
+	LCID, # [in] lcid
+	DWORD, # [in] dwReserved
+	LPVOID, # [in] pvReserved
+	)
+
 class Device(object):
 	def __init__(self, devnum=0, show_video_window=False):
 		self.devnum = devnum
@@ -89,9 +127,9 @@ class Device(object):
 		
 		null_context = POINTER(IBindCtx)()
 		null_moniker = POINTER(IMoniker)()
-		filter_ob = moniker.RemoteBindToObject(null_context,null_moniker,IBaseFilter._iid_)
+		self.source = moniker.RemoteBindToObject(null_context,null_moniker,IBaseFilter._iid_)
 		
-		self.filter_graph.AddFilter(filter_ob, "VideoCapture")
+		self.filter_graph.AddFilter(self.source, "VideoCapture")
 		
 		self.grabber = CreateObject(SampleGrabber)
 		self.filter_graph.AddFilter(self.grabber, "Grabber")
@@ -106,7 +144,7 @@ class Device(object):
 		self.graph_builder.RenderStream(
 			PIN_CATEGORY_CAPTURE,
 			MEDIATYPE_Video,
-			filter_ob,
+			self.source,
 			self.grabber,
 			None,
 			)
@@ -137,7 +175,23 @@ class Device(object):
 
 		self.grabber.SetBufferSamples(True)
 		self.grabber.SetOneShot(False)
-		
+
+	def display_capture_filter_properties(self):
+		self.filter_graph.Stop()
+		cauuid = CAUUID()
+		self.source.GetPages(byref(cauuid))
+		if cauuid.element_count > 0:
+			# self.teardown()
+			# self.initialize()
+			OleCreatePropertyFrame(
+				windll.user32.GetTopWindow(None),
+				0, 0, None,
+				1, byref(cast(self.source, LPUNKNOWN)),
+				cauuid.element_count, cauuid.elements,
+				0, 0, None)
+			windll.ole32.CoTaskMemFree(cauuid.elements)
+			# self.teardown()
+			# self.initialize()
 	
 	def get_buffer(self):
 		media_type = tag_AMMediaType()
@@ -176,5 +230,11 @@ class Device(object):
 def test():
 	d = Device(show_video_window=True)
 	buffer, width, height = d.get_buffer()
+
+def find_name(name):
+	"For testing only; search for a name in the libraries"
+	from comtypes.gen import DirectShowLib, DexterLib
+	from ctypes import wintypes
+	return [x for x in dir(DirectShowLib) + dir(DexterLib) + dir(wintypes) + dir(comtypes) if name.lower() in x.lower()]
 
 if __name__ == '__main__': test()
