@@ -8,6 +8,8 @@ A port of the C++ extension-based version by Markus Gritsch <gritsch@iue.tuwien.
 
 """
 
+from __future__ import print_function
+
 from time import sleep
 
 from comtypes import POINTER
@@ -191,7 +193,7 @@ class Device(object):
 		size = hdr.image_size
 		width = hdr.width
 		height = hdr.height
-		print size, width, height
+		print(size, width, height)
 		assert size % 4 == 0
 		buffer = create_string_buffer(size)
 		long_p_buffer = cast(buffer, POINTER(c_long))
@@ -199,31 +201,35 @@ class Device(object):
 		
 		self.control.Run()
 		
-		while(True):
-			# call the function directly, as the in/out symantics of
-			# argtypes isn't working here.
-			try:
-				GetCurrentBuffer = self.grabber._ISampleGrabber__com_GetCurrentBuffer
-				GetCurrentBuffer(byref(size), long_p_buffer)
-			except COMError, e:
-				if e.args[0] == VFW_E_WRONG_STATE:
-					sleep(100)
-				else: raise
-			else:
-				break
-		
-		if FAILED(res):
+		try:
+			while(True):
+				# call the function directly, as the in/out symantics of
+				# argtypes isn't working here.
+				try:
+					GetCurrentBuffer = self.grabber._ISampleGrabber__com_GetCurrentBuffer
+					GetCurrentBuffer(byref(size), long_p_buffer)
+				except COMError, e:
+					if e.args[0] == VFW_E_WRONG_STATE:
+						print('Waiting for device to become ready...')
+						sleep(.100)
+					else:
+						raise
+				else:
+					break
+		except COMError, e:
+			
 			error_map = dict(
 				E_INVALIDARG="Samples are not being buffered",
 				E_POINTER="NULL pointer argument",
 				VFW_E_NOT_CONNECTED="The filter is not connected",
 				VFW_E_WRONG_STATE="The filter did not buffer a sample yet",
 			)
-			unknown_error = 'Unknown Error ({0:x})'.format(res)
-			msg = "Getting the sample grabber's current buffer failed ({0}).".format(error_map.get(res, unknown_error))
+			code = e[0]
+			unknown_error = 'Unknown Error ({0:x})'.format(code)
+			msg = "Getting the sample grabber's current buffer failed ({0}).".format(error_map.get(code, unknown_error))
 			raise VidcapError(msg)
 		
-		return bytes(buffer)[:size], width, height
+		return bytes(buffer)[:size.value], width, height
 
 def test():
 	global d, buffer, width, height
