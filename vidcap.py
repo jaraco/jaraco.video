@@ -10,16 +10,19 @@ A port of the C++ extension-based version by ___
 
 from comtypes import POINTER
 from comtypes import GUID, CLSCTX_INPROC
-from comtypes.client import CreateObject
+from comtypes.client import CreateObject, GetModule
 from comtypes import CoClass, IUnknown
-from ctypes import cast, POINTER, Structure, c_longlong
+from ctypes import (cast, POINTER, Structure, c_longlong,
+	create_string_buffer, byref, c_long)
 from ctypes.wintypes import (RECT, DWORD, LONG, WORD, ULONG, HWND,
-	UINT, LPCOLESTR, LCID, LPVOID)
+	UINT, LPCOLESTR, LCID, LPVOID, HRESULT)
 from ctypes import windll
 
 from comtypes.gen.DirectShowLib import (FilterGraph, CaptureGraphBuilder2,
 	ICreateDevEnum, typelib_path, IBaseFilter, IBindCtx, IMoniker)
 from comtypes.gen.DexterLib import (SampleGrabber, tag_AMMediaType)
+_quartz = GetModule('quartz.dll')
+IMediaControl = _quartz.IMediaControl
 
 class error(Exception):
 	pass
@@ -63,7 +66,7 @@ class BITMAPINFOHEADER(Structure):
 		('planes', WORD),
 		('bit_count', WORD),
 		('compression', DWORD),
-		('size_image', DWORD),
+		('image_size', DWORD),
 		('x_pels_per_meter', LONG),
 		('y_pels_per_meter', LONG),
 		('clr_used', DWORD),
@@ -111,6 +114,7 @@ class Device(object):
 		self.devnum = devnum
 		self.show_video_window = show_video_window
 		self.filter_graph = CreateObject(FilterGraph)
+		self.control = self.filter_graph.QueryInterface(IMediaControl)
 		self.graph_builder = CreateObject(CaptureGraphBuilder2)
 		self.graph_builder.SetFiltergraph(self.filter_graph)
 		dev_enum = CreateObject(DeviceEnumerator)
@@ -201,18 +205,27 @@ class Device(object):
 		
 		# windll.ole32.CoTaskMemFree(media_type.pbFormat) ?
 		
-		size = p_video_info_header.bmi_header.size # .contents.bmi_header.size?
-		width = p_video_info_header.bmi_header.width
-		height = p_video_info_header.bmi_header.height
-		size = DWORD(size)
-		buffer = ctypes.create_string_buffer(size)
+		hdr = p_video_info_header.contents.bmi_header
+		size = hdr.image_size
+		width = hdr.width
+		height = hdr.height
+		print size, width, height
+		assert size % 4 == 0
+		buffer = create_string_buffer(size)
+		long_p_buffer = cast(buffer, POINTER(c_long))
+		size = c_long(size)
 		
-		self.filter_graph.Run()
+		self.control.Run()
 		
 		while(True):
-			# long_p_buffer = cast(buffer, c_long_p)
-			res = self.grabber.GetCurrentBuffer(byref(size), buffer))
-			sleep(100) if res == VFW_E_WRONG_STATE else break
+			# call the function directly, as the in/out symantics of
+			# argtypes isn't working here.
+			GetCurrentBuffer = self.grabber._ISampleGrabber__com_GetCurrentBuffer
+			GetCurrentBuffer(byref(size), long_p_buffer)
+			print size
+			#if res == VFW_E_WRONG_STATE: sleep(100)
+			#else: break
+			break
 		
 		if FAILED(res):
 			error_map = dict(
@@ -228,6 +241,7 @@ class Device(object):
 		return bytes(buffer)[:size], width, height
 
 def test():
+	global d, buffer, width, height
 	d = Device(show_video_window=True)
 	buffer, width, height = d.get_buffer()
 
@@ -235,6 +249,7 @@ def find_name(name):
 	"For testing only; search for a name in the libraries"
 	from comtypes.gen import DirectShowLib, DexterLib
 	from ctypes import wintypes
+	import comtypes
 	return [x for x in dir(DirectShowLib) + dir(DexterLib) + dir(wintypes) + dir(comtypes) if name.lower() in x.lower()]
 
 if __name__ == '__main__': test()
