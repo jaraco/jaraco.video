@@ -4,14 +4,16 @@ VidCap.py
 
 (c) 2009 Jason R. Coombs
 
-A port of the C++ extension-based version by ___
+A port of the C++ extension-based version by Markus Gritsch <gritsch@iue.tuwien.ac.at>
 
 """
+
+from time import sleep
 
 from comtypes import POINTER
 from comtypes import GUID, CLSCTX_INPROC
 from comtypes.client import CreateObject, GetModule
-from comtypes import CoClass, IUnknown
+from comtypes import CoClass, IUnknown, COMError
 from ctypes import (cast, POINTER, Structure, c_longlong,
 	create_string_buffer, byref, c_long)
 from ctypes.wintypes import (RECT, DWORD, LONG, WORD, ULONG, HWND,
@@ -21,6 +23,7 @@ from ctypes import windll
 from comtypes.gen.DirectShowLib import (FilterGraph, CaptureGraphBuilder2,
 	ICreateDevEnum, typelib_path, IBaseFilter, IBindCtx, IMoniker)
 from comtypes.gen.DexterLib import (SampleGrabber, tag_AMMediaType)
+
 _quartz = GetModule('quartz.dll')
 IMediaControl = _quartz.IMediaControl
 
@@ -34,11 +37,11 @@ def FAILED(hr):
 	return hr < 0
 
 # WinError.h
-E_INVALIDARG = 0x80070057
-E_POINTER = 0x80004003
+E_INVALIDARG = c_long(0x80070057).value
+E_POINTER = c_long(0x80004003).value
 # vfwmsgs.h
-VFW_E_NOT_CONNECTED = 0x80040209
-VFW_E_WRONG_STATE = 0x80040227
+VFW_E_NOT_CONNECTED = c_long(0x80040209).value
+VFW_E_WRONG_STATE = c_long(0x80040227).value
 
 CLSID_VideoInputDeviceCategory = GUID("{860BB310-5D01-11d0-BD3B-00A0C911CE86}")
 
@@ -153,29 +156,8 @@ class Device(object):
 			None,
 			)
 		
-		if not self.show_video_window:
-			raise NotImplementedError
-			"""
-					IVideoWindow *pWindow;
-
-					hr = self->ob_pGraph->QueryInterface(IID_IVideoWindow, (void **)&pWindow);
-					if (FAILED(hr))
-					{
-						PyErr_SetString(VidcapError, "Video Window interface could not be found.");
-						cleanup(self);
-						return FALSE;
-					}
-
-					hr = pWindow->put_AutoShow(OAFALSE);
-					if (FAILED(hr))
-					{
-						PyErr_SetString(VidcapError, "Video Window hiding failed.");
-						cleanup(self);
-						return FALSE;
-					}
-
-					pWindow->Release();
-			"""
+		window = self.filter_graph.QueryInterface(_quartz.IVideoWindow)
+		window.AutoShow = self.show_video_window
 
 		self.grabber.SetBufferSamples(True)
 		self.grabber.SetOneShot(False)
@@ -220,12 +202,15 @@ class Device(object):
 		while(True):
 			# call the function directly, as the in/out symantics of
 			# argtypes isn't working here.
-			GetCurrentBuffer = self.grabber._ISampleGrabber__com_GetCurrentBuffer
-			GetCurrentBuffer(byref(size), long_p_buffer)
-			print size
-			#if res == VFW_E_WRONG_STATE: sleep(100)
-			#else: break
-			break
+			try:
+				GetCurrentBuffer = self.grabber._ISampleGrabber__com_GetCurrentBuffer
+				GetCurrentBuffer(byref(size), long_p_buffer)
+			except COMError, e:
+				if e.args[0] == VFW_E_WRONG_STATE:
+					sleep(100)
+				else: raise
+			else:
+				break
 		
 		if FAILED(res):
 			error_map = dict(
@@ -242,7 +227,7 @@ class Device(object):
 
 def test():
 	global d, buffer, width, height
-	d = Device(show_video_window=True)
+	d = Device(show_video_window=False)
 	buffer, width, height = d.get_buffer()
 
 def find_name(name):
@@ -250,6 +235,6 @@ def find_name(name):
 	from comtypes.gen import DirectShowLib, DexterLib
 	from ctypes import wintypes
 	import comtypes
-	return [x for x in dir(DirectShowLib) + dir(DexterLib) + dir(wintypes) + dir(comtypes) if name.lower() in x.lower()]
+	return [x for x in dir(DirectShowLib) + dir(DexterLib) + dir(wintypes) + dir(comtypes) + dir(_quartz) if name.lower() in x.lower()]
 
 if __name__ == '__main__': test()
