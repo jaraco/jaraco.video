@@ -26,6 +26,8 @@ from comtypes.gen.DirectShowLib import (FilterGraph, CaptureGraphBuilder2,
 	ICreateDevEnum, typelib_path, IBaseFilter, IBindCtx, IMoniker)
 from comtypes.gen.DexterLib import (SampleGrabber, tag_AMMediaType)
 
+from PIL import Image, ImageFont, ImageDraw
+
 _quartz = GetModule('quartz.dll')
 IMediaControl = _quartz.IMediaControl
 
@@ -33,10 +35,6 @@ class error(Exception):
 	pass
 
 class VidCapError(Exception): pass
-
-def FAILED(hr):
-	"http://msdn.microsoft.com/en-us/library/ms693474(VS.85).aspx"
-	return hr < 0
 
 # WinError.h
 E_INVALIDARG = c_long(0x80070057).value
@@ -114,7 +112,15 @@ OleCreatePropertyFrame.argtypes = (
 	LPVOID, # [in] pvReserved
 	)
 
+def consume(iterable):
+	for x in iterable: pass
+
 class Device(object):
+	fonts = dict(
+		normal = ImageFont.load('helvetica-10.pil'),
+		bold = ImageFont.load('helvb08.pil'),
+		)
+	
 	def __init__(self, devnum=0, show_video_window=False):
 		self.devnum = devnum
 		self.show_video_window = show_video_window
@@ -193,7 +199,6 @@ class Device(object):
 		size = hdr.image_size
 		width = hdr.width
 		height = hdr.height
-		print(size, width, height)
 		assert size % 4 == 0
 		buffer = create_string_buffer(size)
 		long_p_buffer = cast(buffer, POINTER(c_long))
@@ -210,7 +215,6 @@ class Device(object):
 					GetCurrentBuffer(byref(size), long_p_buffer)
 				except COMError, e:
 					if e.args[0] == VFW_E_WRONG_STATE:
-						print('Waiting for device to become ready...')
 						sleep(.100)
 					else:
 						raise
@@ -229,12 +233,99 @@ class Device(object):
 			msg = "Getting the sample grabber's current buffer failed ({0}).".format(error_map.get(code, unknown_error))
 			raise VidcapError(msg)
 		
-		return bytes(buffer)[:size.value], width, height
+		return bytes(buffer[:size.value]), (width, height)
+
+	def get_image(self, timestamp=None, font='normal', textpos='bottom-left'):
+		"""Returns a PIL Image instance.
+
+		timestamp:  None    ...       no timestamp (the default)
+		            simple  ...       simple timestamp
+		            shadow  ...       timestamp with shadow
+		            outline ...       timestamp with outline
+		            thick-outline ... timestamp with thick outline
+
+		font:  normal ... normal font (the default)
+		       bold   ... bold font
+
+		textpos: The position of the timestamp can be specified by a string
+		         containing a combination of two words specifying the vertical
+		         and horizontal position of the timestamp.  Abbreviations
+		         are allowed.
+		         Vertical positions: top or bottom
+		         Horizontal positions: left, center, right
+		         
+		         defaults to 'bottom-left'
+		"""
+		buffer, dimensions = self.get_buffer()
+		# todo, what is 'BGR', 0, -1 ?
+		img = Image.fromstring('RGB', dimensions, buffer, 'raw', 'BGR', 0, -1)
+		if timestamp:
+			text = str(datetime.datetime.now())
+			self._add_text(img, text, font, textpos, timestamp)
+		return img
+
+	def _add_text(self, img, text, font, textpos, shadow_style):
+		font = self.fonts[font]
+		text_size = self.font.getsize(text)
+		tw, th = (dim - 2 for dim in self.font.getsize(text))
+		iw, ih = img.size
+		vert_pos, horiz_pos = re.split('[ -]+', textpos.lower())
+		try:
+			x = dict(l=2, c=(iw-tw)//2, r=iw-tw-2)[horiz_pos[0]]
+			y = dict(t=-1, b=ih-th-2)[vert_pos[0]]
+		except Exception:
+			raise ValueError("Invalid textpos {0}".format(textpos))
+
+		draw = ImageDraw.Draw(img)
+		locs = self._get_shadow_draw_locations(shadow_style)
+		textcolor = 0xffffff
+		shadowcolor = 0x000000
+		consume((draw.text(loc, text, font, fill=shadowcolor) for loc in locs))
+		draw.text((x, y), text, font=font, fill=textcolor)
+
+	@staticmethod
+	def _get_shadow_draw_locations(shadow_style):
+		outline_locs = ((x-1, y), (x+1, y), (x, y-1), (x, y+1))
+		shadow_draw_locations = dict(
+			simple = (),
+			shadow = ((x+1, y), (x, y+1), (x+1, y+1)),
+			outline = outline_locs,
+			)
+		shadow_draw_locations['thick-outline'] = (
+			outline_locs + ((x-1, y-1), (x+1, y-1), (x-1, y+1), (x+1, y+1))
+			)
+		locs = shadow_draw_locations.get(shadow_style)
+		if not locs:
+			raise ValueError("Unknown shadow style {0}".format(shadow_style))
+		return locs
+
+	def save_snapshot(self, filename, timestamp=None,
+		font='normal', textpos='bottom-left', *args, **kwargs):
+		"""
+		Saves a snapshot to a file.
+
+		The filetype is inferred from the filename extension. Everything that
+		PIL can handle can be specified (foo.jpg, foo.gif, foo.bmp, ...).
+
+		filename: String containing the name of the resulting file.
+
+		timestamp:	see get_image()
+
+		font:	see get_image()
+
+		textpos:	see get_image()
+
+		Any additional arguments are passed to the save() method of the image
+		class.
+		For example you can specify the compression level of a JPEG image using
+		'quality=95'.
+		"""
+		self.get_image(*args).save(filename, **kwargs)
 
 def test():
 	global d, buffer, width, height
 	d = Device(show_video_window=False)
-	buffer, width, height = d.get_buffer()
+	d.save_snapshot('foo.jpg', timestamp='simple')
 
 def find_name(name):
 	"For testing only; search for a name in the libraries"
