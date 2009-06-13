@@ -10,6 +10,8 @@ A port of the C++ extension-based version by Markus Gritsch <gritsch@iue.tuwien.
 
 from __future__ import print_function
 
+import datetime
+import re
 from time import sleep
 
 from comtypes import POINTER
@@ -266,25 +268,27 @@ class Device(object):
 
 	def _add_text(self, img, text, font, textpos, shadow_style):
 		font = self.fonts[font]
-		text_size = self.font.getsize(text)
-		tw, th = (dim - 2 for dim in self.font.getsize(text))
+		text_size = font.getsize(text)
+		tw, th = (dim - 2 for dim in font.getsize(text))
 		iw, ih = img.size
 		vert_pos, horiz_pos = re.split('[ -]+', textpos.lower())
 		try:
 			x = dict(l=2, c=(iw-tw)//2, r=iw-tw-2)[horiz_pos[0]]
 			y = dict(t=-1, b=ih-th-2)[vert_pos[0]]
+			text_coords = (x,y)
 		except Exception:
 			raise ValueError("Invalid textpos {0}".format(textpos))
 
 		draw = ImageDraw.Draw(img)
-		locs = self._get_shadow_draw_locations(shadow_style)
+		locs = self._get_shadow_draw_locations(text_coords, shadow_style)
 		textcolor = 0xffffff
 		shadowcolor = 0x000000
 		consume((draw.text(loc, text, font, fill=shadowcolor) for loc in locs))
-		draw.text((x, y), text, font=font, fill=textcolor)
+		draw.text(text_coords, text, font=font, fill=textcolor)
 
 	@staticmethod
-	def _get_shadow_draw_locations(shadow_style):
+	def _get_shadow_draw_locations(origin, shadow_style):
+		x, y = origin
 		outline_locs = ((x-1, y), (x+1, y), (x, y-1), (x, y+1))
 		shadow_draw_locations = dict(
 			simple = (),
@@ -295,7 +299,7 @@ class Device(object):
 			outline_locs + ((x-1, y-1), (x+1, y-1), (x-1, y+1), (x+1, y+1))
 			)
 		locs = shadow_draw_locations.get(shadow_style)
-		if not locs:
+		if locs is None:
 			raise ValueError("Unknown shadow style {0}".format(shadow_style))
 		return locs
 
@@ -320,7 +324,7 @@ class Device(object):
 		For example you can specify the compression level of a JPEG image using
 		'quality=95'.
 		"""
-		self.get_image(*args).save(filename, **kwargs)
+		self.get_image(timestamp, font, textpos).save(filename, **kwargs)
 
 def test():
 	global d, buffer, width, height
