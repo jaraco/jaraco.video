@@ -25,7 +25,8 @@ from ctypes.wintypes import (RECT, DWORD, LONG, WORD, ULONG, HWND,
 from ctypes import windll
 
 from comtypes.gen.DirectShowLib import (FilterGraph, CaptureGraphBuilder2,
-	ICreateDevEnum, typelib_path, IBaseFilter, IBindCtx, IMoniker)
+	ICreateDevEnum, typelib_path, IBaseFilter, IBindCtx, IMoniker,
+	IAMStreamConfig,)
 from comtypes.gen.DexterLib import (SampleGrabber, tag_AMMediaType)
 
 from PIL import Image, ImageFont, ImageDraw
@@ -56,6 +57,7 @@ class DeviceEnumerator(CoClass):
 	_reg_typelib_ = ('{24BC6711-3881-420F-8299-34DA1026D31E}', 1, 0)
 
 MEDIATYPE_Video = GUID('{73646976-0000-0010-8000-00AA00389B71}')
+MEDIATYPE_Interleaved = GUID('{73766169-0000-0010-8000-00aa00389b71}')
 MEDIASUBTYPE_RGB24 = GUID('{e436eb7d-524f-11ce-9f53-0020af0ba770}')
 FORMAT_VideoInfo = GUID('{05589f80-c356-11ce-bf01-00aa0055595a}')
 
@@ -114,13 +116,26 @@ OleCreatePropertyFrame.argtypes = (
 	LPVOID, # [in] pvReserved
 	)
 
+IID_ISpecifyPropertyPages = GUID('{B196B28B-BAB4-101A-B69C-00AA00341D07}')
+
+def FreeMediaType(mt):
+	"""http://msdn.microsoft.com/en-us/library/dd375807(VS.85).aspx"""
+	if mt.cbFormat != 0:
+		CoTaskMemFree(mt.pbFormat)
+		mt.cbFormat = 0
+
+def DeleteMediaType(mt):
+	"""http://msdn.microsoft.com/en-us/library/dd375432(VS.85).aspx"""
+	FreeMediaType(mt)
+	CoTaskMemFree(mt)
+
 def consume(iterable):
 	for x in iterable: pass
 
 class Device(object):
 	fonts = dict(
-		normal = ImageFont.load('helvetica-10.pil'),
-		bold = ImageFont.load('helvb08.pil'),
+		normal = ImageFont.truetype('arial.ttf',10),
+		bold = ImageFont.truetype('arialbd.ttf',10),
 		)
 	
 	def __init__(self, devnum=0, show_video_window=False):
@@ -173,22 +188,56 @@ class Device(object):
 		self.grabber.SetOneShot(False)
 
 	def display_capture_filter_properties(self):
-		self.filter_graph.Stop()
+		self.control.Stop()
+		self._do_property_pages(self, self.source)
+
+	@staticmethod
+	def _do_property_pages(self, subject):
 		cauuid = CAUUID()
-		self.source.GetPages(byref(cauuid))
+		spec_pages = subject.QueryInterface(SpecifyPropertyPages)
+		spec_pages.GetPages(byref(cauuid))
 		if cauuid.element_count > 0:
 			# self.teardown()
 			# self.initialize()
 			OleCreatePropertyFrame(
 				windll.user32.GetTopWindow(None),
 				0, 0, None,
-				1, byref(cast(self.source, LPUNKNOWN)),
+				1, byref(cast(subject, LPUNKNOWN)),
 				cauuid.element_count, cauuid.elements,
 				0, 0, None)
 			windll.ole32.CoTaskMemFree(cauuid.elements)
 			# self.teardown()
 			# self.initialize()
-	
+
+	def display_capture_pin_properties(self):
+		self.control.Stop()
+		self._do_property_pages(self._get_stream_config())
+
+	def _get_stream_config(self):
+		args = [
+				PIN_CATEGORY_CAPTURE,
+				MEDIATYPE_Interleaved,
+				self.source,
+				IAMStreamConfig,
+				]
+		try:
+			stream_config = self.graph_builder.FindInterface(*args)
+		except COMError, e:
+			args[1] = MEDIATYPE_Video
+			stream_config = self.graph_builder.FindInterface(*args)
+		return stream_config
+
+	def set_resolution(self, width, height):
+		stream_config = self._get_stream_config()
+		media_type = stream_config.GetFormat()
+		if media_type.formattype != FORMAT_VideoInfo:
+			raise VidCapError("Cannot query capture format")
+		p_video_info_header = cast(media_type.pbFormat, POINTER(VIDEOINFOHEADER))
+		hdr = p_video_info_header.contents.bmi_header
+		hdr.biWidth, hdr.biHeight = width, height
+		stream_config.SetFormat(media_type)
+		DeleteMediaType(mt)
+
 	def get_buffer(self):
 		media_type = tag_AMMediaType()
 		self.grabber.GetConnectedMediaType(media_type)
@@ -336,6 +385,9 @@ def find_name(name):
 	from comtypes.gen import DirectShowLib, DexterLib
 	from ctypes import wintypes
 	import comtypes
-	return [x for x in dir(DirectShowLib) + dir(DexterLib) + dir(wintypes) + dir(comtypes) + dir(_quartz) if name.lower() in x.lower()]
+	for lib in DirectShowLib, DexterLib, wintypes, comtypes, _quartz:
+		res = [x for x in dir(lib) if name.lower() in x.lower()]
+		if res:
+			print('found {0} in {1} as {2}'.format(name, lib, ', '.join(res)))
 
 if __name__ == '__main__': test()
