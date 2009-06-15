@@ -130,13 +130,15 @@ class ISpecifyPropertyPages(IUnknown):
 def FreeMediaType(mt):
 	"""http://msdn.microsoft.com/en-us/library/dd375807(VS.85).aspx"""
 	if mt.cbFormat != 0:
-		CoTaskMemFree(mt.pbFormat)
+		windll.ole32.CoTaskMemFree(mt.pbFormat)
 		mt.cbFormat = 0
 
 def DeleteMediaType(mt):
 	"""http://msdn.microsoft.com/en-us/library/dd375432(VS.85).aspx"""
 	FreeMediaType(mt)
-	CoTaskMemFree(mt)
+	# I don't think we need to free the media type; comtypes should
+	#  handle that
+	#windll.ole32.CoTaskMemFree(mt)
 
 def consume(iterable):
 	for x in iterable: pass
@@ -233,18 +235,20 @@ class Device(object):
 		except COMError, e:
 			args[1] = MEDIATYPE_Video
 			stream_config = self.graph_builder.RemoteFindInterface(*args)
-		return stream_config
+		return cast(stream_config, POINTER(IAMStreamConfig)).value
 
 	def set_resolution(self, width, height):
+		self.control.Stop()
 		stream_config = self._get_stream_config()
-		media_type = stream_config.GetFormat()
+		p_media_type = stream_config.GetFormat()
+		media_type = p_media_type.contents
 		if media_type.formattype != FORMAT_VideoInfo:
 			raise VidCapError("Cannot query capture format")
 		p_video_info_header = cast(media_type.pbFormat, POINTER(VIDEOINFOHEADER))
 		hdr = p_video_info_header.contents.bmi_header
 		hdr.biWidth, hdr.biHeight = width, height
 		stream_config.SetFormat(media_type)
-		DeleteMediaType(mt)
+		DeleteMediaType(media_type)
 
 	def get_buffer(self):
 		media_type = tag_AMMediaType()
