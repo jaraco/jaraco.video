@@ -15,7 +15,7 @@ import re
 from time import sleep
 
 from comtypes import POINTER
-from comtypes import GUID, CLSCTX_INPROC
+from comtypes import GUID, CLSCTX_INPROC, COMMETHOD
 from comtypes.client import CreateObject, GetModule
 from comtypes import CoClass, IUnknown, COMError
 from ctypes import (cast, POINTER, Structure, c_longlong,
@@ -116,7 +116,16 @@ OleCreatePropertyFrame.argtypes = (
 	LPVOID, # [in] pvReserved
 	)
 
-IID_ISpecifyPropertyPages = GUID('{B196B28B-BAB4-101A-B69C-00AA00341D07}')
+class ISpecifyPropertyPages(IUnknown):
+	_case_insensitive_ = True
+	_iid_ = GUID('{B196B28B-BAB4-101A-B69C-00AA00341D07}')
+	_idlflags_ = []
+	_methods_ = [
+		COMMETHOD([], HRESULT, 'GetPages',
+			(['out'], POINTER(CAUUID), 'pPages'),
+			),
+		]
+
 
 def FreeMediaType(mt):
 	"""http://msdn.microsoft.com/en-us/library/dd375807(VS.85).aspx"""
@@ -193,9 +202,8 @@ class Device(object):
 
 	@staticmethod
 	def _do_property_pages(self, subject):
-		cauuid = CAUUID()
-		spec_pages = subject.QueryInterface(SpecifyPropertyPages)
-		spec_pages.GetPages(byref(cauuid))
+		spec_pages = subject.QueryInterface(ISpecifyPropertyPages)
+		cauuid = spec_pages.GetPages()
 		if cauuid.element_count > 0:
 			# self.teardown()
 			# self.initialize()
