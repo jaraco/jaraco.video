@@ -198,10 +198,10 @@ class Device(object):
 
 	def display_capture_filter_properties(self):
 		self.control.Stop()
-		self._do_property_pages(self, self.source)
+		self._do_property_pages(self.source)
 
 	@staticmethod
-	def _do_property_pages(self, subject):
+	def _do_property_pages(subject):
 		spec_pages = subject.QueryInterface(ISpecifyPropertyPages)
 		cauuid = spec_pages.GetPages()
 		if cauuid.element_count > 0:
@@ -226,13 +226,13 @@ class Device(object):
 				PIN_CATEGORY_CAPTURE,
 				MEDIATYPE_Interleaved,
 				self.source,
-				IAMStreamConfig,
+				IAMStreamConfig._iid_,
 				]
 		try:
-			stream_config = self.graph_builder.FindInterface(*args)
+			stream_config = self.graph_builder.RemoteFindInterface(*args)
 		except COMError, e:
 			args[1] = MEDIATYPE_Video
-			stream_config = self.graph_builder.FindInterface(*args)
+			stream_config = self.graph_builder.RemoteFindInterface(*args)
 		return stream_config
 
 	def set_resolution(self, width, height):
@@ -290,7 +290,7 @@ class Device(object):
 			code = e[0]
 			unknown_error = 'Unknown Error ({0:x})'.format(code)
 			msg = "Getting the sample grabber's current buffer failed ({0}).".format(error_map.get(code, unknown_error))
-			raise VidcapError(msg)
+			raise VidCapError(msg)
 		
 		return bytes(buffer[:size.value]), (width, height)
 
