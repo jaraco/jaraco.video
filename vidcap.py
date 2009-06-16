@@ -1,18 +1,22 @@
 
 """
-VidCap.py
+vidcap.py
 
 (c) 2009 Jason R. Coombs
 
-A port of the C++ extension-based version by Markus Gritsch <gritsch@iue.tuwien.ac.at>
+A port of the C++ extension-based version by Markus Gritsch:
+ http://videocapture.sourceforge.net/
 
 """
 
+# Since the Gritsch's implementation supports through Python 2.6,
+#  I'll assume Python 2.6 or greater.
 from __future__ import print_function
 
 import datetime
 import re
 from time import sleep
+import logging
 
 from comtypes import POINTER
 from comtypes import GUID, CLSCTX_INPROC, COMMETHOD
@@ -30,6 +34,8 @@ from comtypes.gen.DirectShowLib import (FilterGraph, CaptureGraphBuilder2,
 from comtypes.gen.DexterLib import (SampleGrabber, tag_AMMediaType)
 
 from PIL import Image, ImageFont, ImageDraw
+
+log = logging.getLogger(__name__)
 
 _quartz = GetModule('quartz.dll')
 IMediaControl = _quartz.IMediaControl
@@ -144,11 +150,14 @@ def consume(iterable):
 	for x in iterable: pass
 
 class Device(object):
-	fonts = dict(
-		normal = ImageFont.truetype('arial.ttf',10),
-		bold = ImageFont.truetype('arialbd.ttf',10),
-		)
-	
+	try:
+		fonts = dict(
+			normal = ImageFont.truetype('arial.ttf',10),
+			bold = ImageFont.truetype('arialbd.ttf',10),
+			)
+	except:
+		log.warning("PIL ImageFont construction failed, text ops will fail")
+		
 	def __init__(self, devnum=0, show_video_window=False):
 		self.devnum = devnum
 		self.show_video_window = show_video_window
@@ -232,7 +241,7 @@ class Device(object):
 				]
 		try:
 			stream_config = self.graph_builder.RemoteFindInterface(*args)
-		except COMError, e:
+		except COMError as e:
 			args[1] = MEDIATYPE_Video
 			stream_config = self.graph_builder.RemoteFindInterface(*args)
 		return cast(stream_config, POINTER(IAMStreamConfig)).value
@@ -276,14 +285,14 @@ class Device(object):
 				try:
 					GetCurrentBuffer = self.grabber._ISampleGrabber__com_GetCurrentBuffer
 					GetCurrentBuffer(byref(size), long_p_buffer)
-				except COMError, e:
+				except COMError as e:
 					if e.args[0] == VFW_E_WRONG_STATE:
 						sleep(.100)
 					else:
 						raise
 				else:
 					break
-		except COMError, e:
+		except COMError as e:
 			
 			error_map = dict(
 				E_INVALIDARG="Samples are not being buffered",
