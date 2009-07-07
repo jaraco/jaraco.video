@@ -426,6 +426,8 @@ class Device(object):
 def test():
 	global d, buffer, width, height
 	d = Device(show_video_window=False)
+	# for my device, I can set the resolution here
+	#d.set_resolution(320,240)
 	d.save_snapshot('foo.jpg', timestamp='simple')
 
 def find_name(name):
