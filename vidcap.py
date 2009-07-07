@@ -161,6 +161,9 @@ class Device(object):
 	def __init__(self, devnum=0, show_video_window=False):
 		self.devnum = devnum
 		self.show_video_window = show_video_window
+		self.initialize()
+
+	def initialize(self):
 		self.filter_graph = CreateObject(FilterGraph)
 		self.control = self.filter_graph.QueryInterface(IMediaControl)
 		self.graph_builder = CreateObject(CaptureGraphBuilder2)
@@ -206,6 +209,21 @@ class Device(object):
 
 		self.grabber.SetBufferSamples(True)
 		self.grabber.SetOneShot(False)
+
+	def teardown(self):
+		if hasattr(self, 'control'):
+			self.control.Stop()
+			self.control.Release()
+			del self.control
+		if hasattr(self, 'grabber'):
+			self.grabber.Release()
+			del self.grabber
+		if hasattr(self, 'graph_builder'):
+			self.graph_builder.Release()
+			del self.graph_builder
+		if hasattr(self, 'filter_graph'):
+			self.filter_graph.Release()
+			del self.filter_graph
 
 	def display_capture_filter_properties(self):
 		self.control.Stop()
@@ -258,6 +276,9 @@ class Device(object):
 		hdr.biWidth, hdr.biHeight = width, height
 		stream_config.SetFormat(media_type)
 		DeleteMediaType(media_type)
+		stream_config.Release()
+		#self.teardown()
+		#self.initialize()
 
 	def get_buffer(self):
 		media_type = tag_AMMediaType()
