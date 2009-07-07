@@ -273,10 +273,10 @@ class Device(object):
 			raise VidCapError("Cannot query capture format")
 		p_video_info_header = cast(media_type.pbFormat, POINTER(VIDEOINFOHEADER))
 		hdr = p_video_info_header.contents.bmi_header
-		hdr.biWidth, hdr.biHeight = width, height
+		hdr.width, hdr.height = width, height
 		stream_config.SetFormat(media_type)
 		DeleteMediaType(media_type)
-		stream_config.Release()
+		#stream_config.Release()
 		#self.teardown()
 		#self.initialize()
 
