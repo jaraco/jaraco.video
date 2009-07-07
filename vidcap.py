@@ -30,7 +30,7 @@ from ctypes import windll
 
 from comtypes.gen.DirectShowLib import (FilterGraph, CaptureGraphBuilder2,
 	ICreateDevEnum, typelib_path, IBaseFilter, IBindCtx, IMoniker,
-	IAMStreamConfig,)
+	IAMStreamConfig, IAMVideoControl,)
 from comtypes.gen.DexterLib import (SampleGrabber, tag_AMMediaType)
 
 from PIL import Image, ImageFont, ImageDraw
@@ -250,19 +250,25 @@ class Device(object):
 		self.control.Stop()
 		self._do_property_pages(self._get_stream_config())
 
-	def _get_stream_config(self):
+	def _get_graph_builder_interface(self, interface):
 		args = [
 				PIN_CATEGORY_CAPTURE,
 				MEDIATYPE_Interleaved,
 				self.source,
-				IAMStreamConfig._iid_,
+				interface._iid_,
 				]
 		try:
-			stream_config = self.graph_builder.RemoteFindInterface(*args)
+			result = self.graph_builder.RemoteFindInterface(*args)
 		except COMError as e:
 			args[1] = MEDIATYPE_Video
-			stream_config = self.graph_builder.RemoteFindInterface(*args)
-		return cast(stream_config, POINTER(IAMStreamConfig)).value
+			result = self.graph_builder.RemoteFindInterface(*args)
+		return cast(result, POINTER(interface)).value
+
+	def _get_stream_config(self):
+		return self._get_graph_builder_interface(IAMStreamConfig)
+
+	def _get_video_control(self):
+		return self._get_graph_builder_interface(IAMVideoControl)
 
 	def set_resolution(self, width, height):
 		self.control.Stop()
