@@ -35,7 +35,7 @@ from comtypes.gen.DexterLib import (SampleGrabber, tag_AMMediaType)
 
 from PIL import Image, ImageFont, ImageDraw
 
-from .bitutil import Flags
+import bitutil
 
 log = logging.getLogger(__name__)
 
@@ -298,10 +298,13 @@ class Device(object):
 	def set_mode(self, mode, value): 
 		video_control = self._get_video_control() 
 		ppin = self._get_ppin() 
-		mode_res = video_control.GetMode(ppin)
-		vc_flags = VideoControlFlags(mode_res)
+		mode_val = video_control.GetMode(ppin)
+		vc_flags = VideoControlFlags.from_number(mode_val)
 		vc_flags[mode] = bool(value)
 		video_control.SetMode(ppin, vc_flags.number)
+		new_mode_val = video_control.Getmode(ppin)
+		if new_mode_val == mode_val:
+			log.warning("Mode value appears unchanged on attempt to set %s", mode)
 
 	def set_resolution(self, width, height):
 		self.control.Stop()
@@ -458,9 +461,12 @@ class Device(object):
 
 def test():
 	global d, buffer, width, height
+	logging.basicConfig(level=logging.INFO)
 	d = Device(show_video_window=False)
 	# for my device, I can set the resolution here
 	#d.set_resolution(320,240)
+	d.set_mode('flip_horizontal', True)
+	d.set_mode('flip_vertical', True)
 	d.save_snapshot('foo.jpg', timestamp='simple')
 
 def find_name(name):
