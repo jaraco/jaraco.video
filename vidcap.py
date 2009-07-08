@@ -71,6 +71,9 @@ PIN_CATEGORY_CAPTURE = GUID('{fb6c4281-0353-11d1-905f-0000c0cc16ba}')
 
 REFERENCE_TIME = c_longlong
 
+PINDIR_INPUT = 0
+PINDIR_OUTPUT = 1
+
 class BITMAPINFOHEADER(Structure):
 	_fields_ = (
 		('size', DWORD),
@@ -269,6 +272,38 @@ class Device(object):
 
 	def _get_video_control(self):
 		return self._get_graph_builder_interface(IAMVideoControl)
+
+	def _get_ppin(self): 
+		try: 
+			return self.graph_builder.FindPin(self.source, PINDIR_OUTPUT, PIN_CATEGORY_CAPTURE, MEDIATYPE_Interleaved, False, 0) 
+		except COMError as e: 
+			return self.graph_builder.FindPin(self.source, PINDIR_OUTPUT, PIN_CATEGORY_CAPTURE, MEDIATYPE_Video, False, 0) 
+
+	def get_capabilities(self): 
+		video_control = self._get_video_control() 
+		ppin = self._get_ppin() 
+		return video_control.GetCaps(ppin) 
+
+	def _get_mode(self): 
+		video_control = self._get_video_control() 
+		ppin = self._get_ppin() 
+		return video_control.GetMode(ppin) 
+
+	# http://msdn.microsoft.com/en-us/library/dd407321(VS.85).aspx 
+	def set_mode(self, mode, value): 
+		video_control = self._get_video_control() 
+		ppin = self._get_ppin() 
+		video_control_flags = video_control.GetMode(ppin) 
+		video_control_dict = {'flip_horizontal': video_control_flags & 1, 
+							  'flip_vertical': (video_control_flags & 2) >> 1, 
+							  'external_trigger_enable': (video_control_flags & 4) >> 2, 
+							  'trigger': (video_control_flags & 8) >> 3} 
+		video_control_dict[mode] = int(value) # 1 or 0, True or False 
+		video_control_flags = video_control_dict['flip_horizontal'] + \ 
+							  (video_control_dict['flip_vertical'] << 1) + \ 
+							  (video_control_dict['external_trigger_enable'] << 2) + \ 
+							  (video_control_dict['trigger'] << 4) 
+		video_control.SetMode(ppin, video_control_flags) 
 
 	def set_resolution(self, width, height):
 		self.control.Stop()
