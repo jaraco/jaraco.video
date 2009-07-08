@@ -35,6 +35,8 @@ from comtypes.gen.DexterLib import (SampleGrabber, tag_AMMediaType)
 
 from PIL import Image, ImageFont, ImageDraw
 
+from .bitutil import Flags
+
 log = logging.getLogger(__name__)
 
 _quartz = GetModule('quartz.dll')
@@ -151,6 +153,9 @@ def DeleteMediaType(mt):
 
 def consume(iterable):
 	for x in iterable: pass
+
+class VideoControlFlags(bitutil.Flags):
+	_names = 'flip_horizontal flip_vertical external_trigger_enable trigger'.split()
 
 class Device(object):
 	try:
@@ -293,17 +298,10 @@ class Device(object):
 	def set_mode(self, mode, value): 
 		video_control = self._get_video_control() 
 		ppin = self._get_ppin() 
-		video_control_flags = video_control.GetMode(ppin) 
-		video_control_dict = {'flip_horizontal': video_control_flags & 1, 
-							  'flip_vertical': (video_control_flags & 2) >> 1, 
-							  'external_trigger_enable': (video_control_flags & 4) >> 2, 
-							  'trigger': (video_control_flags & 8) >> 3} 
-		video_control_dict[mode] = int(value) # 1 or 0, True or False 
-		video_control_flags = video_control_dict['flip_horizontal'] + \ 
-							  (video_control_dict['flip_vertical'] << 1) + \ 
-							  (video_control_dict['external_trigger_enable'] << 2) + \ 
-							  (video_control_dict['trigger'] << 4) 
-		video_control.SetMode(ppin, video_control_flags) 
+		mode_res = video_control.GetMode(ppin)
+		vc_flags = VideoControlFlags(mode_res)
+		vc_flags[mode] = bool(value)
+		video_control.SetMode(ppin, vc_flags.number)
 
 	def set_resolution(self, width, height):
 		self.control.Stop()
