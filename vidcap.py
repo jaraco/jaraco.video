@@ -42,9 +42,6 @@ log = logging.getLogger(__name__)
 _quartz = GetModule('quartz.dll')
 IMediaControl = _quartz.IMediaControl
 
-class error(Exception):
-	pass
-
 class VidCapError(Exception): pass
 
 # WinError.h
