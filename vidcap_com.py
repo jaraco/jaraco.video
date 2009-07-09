@@ -50,6 +50,9 @@ REFERENCE_TIME = c_longlong
 PINDIR_INPUT = 0
 PINDIR_OUTPUT = 1
 
+OA_TRUE = -1
+OA_FALSE = 0
+
 class BITMAPINFOHEADER(Structure):
 	_fields_ = (
 		('size', DWORD),

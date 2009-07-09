@@ -82,7 +82,7 @@ class Device(object):
 			)
 		
 		window = self.filter_graph.QueryInterface(IVideoWindow)
-		window.AutoShow = self.show_video_window
+		window.AutoShow = [OA_FALSE, OA_TRUE][self.show_video_window]
 
 		self.grabber.SetBufferSamples(True)
 		self.grabber.SetOneShot(False)
