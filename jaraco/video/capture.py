@@ -12,7 +12,7 @@ that is fully compatibly with the Gritsch library, please download
 revision 1616 from https://svn.jaraco.com/jaraco/python/jaraco.video.
 """
 
-from __future__ import absolute_imports
+from __future__ import absolute_import
 
 import datetime
 import re

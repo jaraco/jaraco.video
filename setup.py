@@ -36,6 +36,8 @@ setup (name = name,
 			],
 		),
 		install_requires=[
+			'comtypes',
+			# PIL is required for some image processes
 		],
 		extras_require = {
 		},
