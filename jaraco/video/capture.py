@@ -1,16 +1,18 @@
+# -*- encoding: utf-8 -*-
 """
-vidcap.py
+Video Framegrabber for Windows
 
-(c) 2009 Jason R. Coombs
+Copyright © 2009-2010 Jason R. Coombs
 
-A port of the C++ extension-based version by Markus Gritsch:
+Based on the C++ extension-based version by Markus Gritsch:
  http://videocapture.sourceforge.net/
 
+This version has been refactored for easier packaging. For a version
+that is fully compatibly with the Gritsch library, please download
+revision 1616 from https://svn.jaraco.com/jaraco/python/jaraco.video.
 """
 
-# Since the Gritsch's implementation supports through Python 2.6,
-#  I'll assume Python 2.6 or greater.
-from __future__ import print_function
+from __future__ import absolute_imports
 
 import datetime
 import re
@@ -19,7 +21,7 @@ import logging
 
 from PIL import Image, ImageFont, ImageDraw
 
-from vidcap_com import *
+from .api.objects import *
 
 log = logging.getLogger(__name__)
 
@@ -328,24 +330,23 @@ class Device(object):
 		"""
 		self.get_image(timestamp, font, textpos).save(filename, **kwargs)
 
-def test():
-	global d, buffer, width, height
+def save_frame(filename = 'test.jpg', resolution = None, mode=None):
+	"""
+	Save a video frame from the default device.
+	
+	resolution, if specified, should be something like (320,240)
+	
+	mode should be a dictionary of mode key/values, like
+	 dict(flip_horizontal=True)
+	"""
+	if mode is None: mode = dict()
 	logging.basicConfig(level=logging.INFO)
 	d = Device(show_video_window=False)
-	# for my device, I can set the resolution here
-	#d.set_resolution(320,240)
-	d.set_mode('flip_horizontal', True)
-	d.set_mode('flip_vertical', True)
-	d.save_snapshot('test.jpg', timestamp='simple')
+	if resolution:
+		d.set_resolution(*resolution)
+	for pair in mode.items():
+		d.set_mode(*pair)
+	d.save_snapshot(filename, timestamp='simple')
 
-def find_name(name):
-	"For testing only; search for a name in the libraries"
-	from comtypes.gen import DirectShowLib, DexterLib
-	from ctypes import wintypes
-	import comtypes
-	for lib in DirectShowLib, DexterLib, wintypes, comtypes:
-		res = [x for x in dir(lib) if name.lower() in x.lower()]
-		if res:
-			print('found {0} in {1} as {2}'.format(name, lib, ', '.join(res)))
-
-if __name__ == '__main__': test()
+if __name__ == '__main__':
+	save_frame()
