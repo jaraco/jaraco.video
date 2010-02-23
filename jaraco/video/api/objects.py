@@ -13,7 +13,7 @@ from comtypes.gen.DirectShowLib import (FilterGraph, CaptureGraphBuilder2,
 	IAMStreamConfig, IAMVideoControl,)
 from comtypes.gen.DexterLib import (SampleGrabber, tag_AMMediaType)
 
-import bitutil
+from jaraco.video import bitutil
 
 _quartz = GetModule('quartz.dll')
 IMediaControl = _quartz.IMediaControl
