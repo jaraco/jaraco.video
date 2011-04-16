@@ -2,7 +2,7 @@
 """
 Video Framegrabber for Windows
 
-Copyright © 2009-2010 Jason R. Coombs
+Copyright © 2009-2011 Jason R. Coombs
 
 Based on the C++ extension-based version by Markus Gritsch:
  http://videocapture.sourceforge.net/
@@ -14,12 +14,22 @@ revision 1616 from https://svn.jaraco.com/jaraco/python/jaraco.video.
 
 from __future__ import absolute_import
 
+import warnings
 import datetime
 import re
-from time import sleep
+import time
 import logging
 
-from PIL import Image, ImageFont, ImageDraw
+try:
+	from PIL import Image, ImageFont, ImageDraw
+except ImportError:
+	try:
+		# installing PIL using setuptools sometimes leaves out the top-
+		#  level module
+		import Image, ImageFont, ImageDraw
+	except ImportError:
+		warnings.warn("PIL not available, many functions will be "
+			"unavailable")
 
 from .api.objects import *
 
@@ -221,7 +231,7 @@ class Device(object):
 					GetCurrentBuffer(byref(size), long_p_buffer)
 				except COMError as e:
 					if e.args[0] == VFW_E_WRONG_STATE:
-						sleep(.100)
+						time.sleep(.100)
 					else:
 						raise
 				else:
