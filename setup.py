@@ -42,6 +42,9 @@ setup_params = dict(
 	},
 	dependency_links = [
 	],
+	setup_requires=[
+		'hgtools',
+	],
 )
 
 if __name__ == '__main__':
