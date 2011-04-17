@@ -16,7 +16,7 @@ setup_params = dict(
 	name = name,
 	use_hg_version=dict(increment='0.1'),
 	description = 'A pure-python framegrabber for Windows',
-	long_description = open('README.txt').read().strip(),
+	long_description = open('README').read().strip(),
 	author = 'Jason R. Coombs',
 	author_email = 'jaraco@jaraco.com',
 	url = 'http://pypi.python.org/pypi/'+name,
