@@ -26,10 +26,9 @@ def directory_context(dir):
 	os.chdir(orig)
 
 def generate_typelibs():
-	req = pkg_resources.Requirement.parse('jaraco.video')
 	fn = functools.partial(
 		pkg_resources.resource_filename,
-		req,
+		__name__,
 	)
 	with directory_context(fn('DirectShow')):
 		map(comtypes.client.GetModule, [
