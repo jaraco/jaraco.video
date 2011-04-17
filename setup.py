@@ -14,7 +14,7 @@ name = 'jaraco.video'
 
 setup_params = dict(
 	name = name,
-	use_hg_version=dict(increment='1.0'),
+	use_hg_version=dict(increment='0.1'),
 	description = 'A pure-python framegrabber for Windows',
 	#long_description = open('docs/index.txt').read().strip(),
 	author = 'Jason R. Coombs',
