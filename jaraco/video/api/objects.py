@@ -3,9 +3,9 @@ from comtypes import GUID, CLSCTX_INPROC, COMMETHOD
 from comtypes.client import CreateObject, GetModule
 from comtypes import CoClass, IUnknown, COMError
 from ctypes import (cast, POINTER, Structure, c_longlong,
-	create_string_buffer, byref, c_long)
+	create_string_buffer, byref, c_long, HRESULT)
 from ctypes.wintypes import (RECT, DWORD, LONG, WORD, ULONG, HWND,
-	UINT, LPCOLESTR, LCID, LPVOID, HRESULT)
+	UINT, LPCOLESTR, LCID, LPVOID)
 from ctypes import windll
 
 from comtypes.gen.DirectShowLib import (FilterGraph, CaptureGraphBuilder2,
