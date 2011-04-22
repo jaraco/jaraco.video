@@ -28,6 +28,7 @@ setup_params = dict(
 	classifiers = [
 		"Development Status :: 5 - Production/Stable",
 		"Intended Audience :: Developers",
+		"Operating System :: Microsoft :: Windows",
 		"Programming Language :: Python :: 2",
 		"Programming Language :: Python :: 3",
 		"Topic :: Multimedia :: Video :: Capture",
