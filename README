@@ -29,10 +29,6 @@ and including 32-bit and 64-bit versions of Python.
 Issues
 ------
 
-It does not currently install properly on Python 2.7 due to `a bug in
-comtypes
-<https://sourceforge.net/tracker/?func=detail&aid=3036368&group_id=115265&atid=692940>`_.
-
 Although the package currently installs on Python 3, there is currently
 no supported version of PIL for Python 3, so only raw bitmap data will
 be available (no JPEG support, etc).
