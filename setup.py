@@ -26,10 +26,11 @@ setup_params = dict(
 	namespace_packages = ['jaraco',],
 	license = 'MIT',
 	classifiers = [
-		"Development Status :: 4 - Beta",
+		"Development Status :: 5 - Production/Stable",
 		"Intended Audience :: Developers",
 		"Programming Language :: Python :: 2",
 		"Programming Language :: Python :: 3",
+		"Topic :: Multimedia :: Video :: Capture",
 	],
 	entry_points = dict(
 		console_scripts = [
