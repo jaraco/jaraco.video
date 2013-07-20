@@ -8,5 +8,5 @@ def find_name(name):
 	for lib in DirectShowLib, DexterLib, wintypes, comtypes:
 		res = [x for x in dir(lib) if name.lower() in x.lower()]
 		if res:
-			items = ', '.join(res)
-			print('found {name} in {lib} as {items}'.format(**vars()))
+			print('found {name} in {lib} as {items}'.format(
+				items = ', '.join(res), **vars()))
