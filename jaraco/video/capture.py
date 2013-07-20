@@ -2,7 +2,7 @@
 """
 Video Framegrabber for Windows
 
-Copyright © 2009-2011 Jason R. Coombs
+Copyright © 2009-2013 Jason R. Coombs
 
 Based on the C++ extension-based version by Markus Gritsch:
  http://videocapture.sourceforge.net/
@@ -46,7 +46,7 @@ class Device(object):
 			)
 	except:
 		log.warning("PIL ImageFont construction failed, text ops will fail")
-		
+
 	def __init__(self, devnum=0, show_video_window=False):
 		self.devnum = devnum
 		self.show_video_window = show_video_window
@@ -60,31 +60,31 @@ class Device(object):
 		dev_enum = CreateObject(DeviceEnumerator)
 		class_enum = dev_enum.CreateClassEnumerator(CLSID_VideoInputDeviceCategory, 0)
 		#del dev_enum
-		
+
 		# for now, assume one device
 		try:
 			(moniker, fetched) = class_enum.RemoteNext(1)
 		except ValueError:
 			raise RuntimeError("Device not found")
-		
+
 		# del class_enum
-		
+
 		null_context = POINTER(IBindCtx)()
 		null_moniker = POINTER(IMoniker)()
 		self.source = moniker.RemoteBindToObject(null_context,null_moniker,IBaseFilter._iid_)
-		
+
 		self.filter_graph.AddFilter(self.source, "VideoCapture")
-		
+
 		self.grabber = CreateObject(SampleGrabber)
 		self.filter_graph.AddFilter(self.grabber, "Grabber")
-		
+
 		mt = tag_AMMediaType()
 		mt.majortype = MEDIATYPE_Video
 		mt.subtype = MEDIASUBTYPE_RGB24;
 		mt.formattype = FORMAT_VideoInfo;
-		
+
 		self.grabber.SetMediaType(mt)
-		
+
 		self.graph_builder.RenderStream(
 			PIN_CATEGORY_CAPTURE,
 			MEDIATYPE_Video,
@@ -92,7 +92,7 @@ class Device(object):
 			self.grabber,
 			None,
 			)
-		
+
 		window = self.filter_graph.QueryInterface(IVideoWindow)
 		window.AutoShow = [OA_FALSE, OA_TRUE][self.show_video_window]
 
@@ -159,26 +159,26 @@ class Device(object):
 	def _get_video_control(self):
 		return self._get_graph_builder_interface(IAMVideoControl)
 
-	def _get_ppin(self): 
-		try: 
-			return self.graph_builder.FindPin(self.source, PINDIR_OUTPUT, PIN_CATEGORY_CAPTURE, MEDIATYPE_Interleaved, False, 0) 
-		except COMError as e: 
-			return self.graph_builder.FindPin(self.source, PINDIR_OUTPUT, PIN_CATEGORY_CAPTURE, MEDIATYPE_Video, False, 0) 
+	def _get_ppin(self):
+		try:
+			return self.graph_builder.FindPin(self.source, PINDIR_OUTPUT, PIN_CATEGORY_CAPTURE, MEDIATYPE_Interleaved, False, 0)
+		except COMError as e:
+			return self.graph_builder.FindPin(self.source, PINDIR_OUTPUT, PIN_CATEGORY_CAPTURE, MEDIATYPE_Video, False, 0)
 
-	def get_capabilities(self): 
-		video_control = self._get_video_control() 
-		ppin = self._get_ppin() 
-		return video_control.GetCaps(ppin) 
+	def get_capabilities(self):
+		video_control = self._get_video_control()
+		ppin = self._get_ppin()
+		return video_control.GetCaps(ppin)
 
-	def _get_mode(self): 
-		video_control = self._get_video_control() 
-		ppin = self._get_ppin() 
-		return video_control.GetMode(ppin) 
+	def _get_mode(self):
+		video_control = self._get_video_control()
+		ppin = self._get_ppin()
+		return video_control.GetMode(ppin)
 
-	# http://msdn.microsoft.com/en-us/library/dd407321(VS.85).aspx 
-	def set_mode(self, mode, value): 
-		video_control = self._get_video_control() 
-		ppin = self._get_ppin() 
+	# http://msdn.microsoft.com/en-us/library/dd407321(VS.85).aspx
+	def set_mode(self, mode, value):
+		video_control = self._get_video_control()
+		ppin = self._get_ppin()
 		mode_val = video_control.GetMode(ppin)
 		vc_flags = VideoControlFlags.from_number(mode_val)
 		vc_flags[mode] = bool(value)
@@ -206,11 +206,11 @@ class Device(object):
 	def get_buffer(self):
 		media_type = tag_AMMediaType()
 		self.grabber.GetConnectedMediaType(media_type)
-		
+
 		p_video_info_header = cast(media_type.pbFormat, POINTER(VIDEOINFOHEADER))
-		
+
 		# windll.ole32.CoTaskMemFree(media_type.pbFormat) ?
-		
+
 		hdr = p_video_info_header.contents.bmi_header
 		size = hdr.image_size
 		width = hdr.width
@@ -219,9 +219,9 @@ class Device(object):
 		buffer = create_string_buffer(size)
 		long_p_buffer = cast(buffer, POINTER(c_long))
 		size = c_long(size)
-		
+
 		self.control.Run()
-		
+
 		try:
 			while(True):
 				# call the function directly, as the in/out symantics of
@@ -237,7 +237,7 @@ class Device(object):
 				else:
 					break
 		except COMError as e:
-			
+
 			error_map = dict(
 				E_INVALIDARG="Samples are not being buffered",
 				E_POINTER="NULL pointer argument",
@@ -248,7 +248,7 @@ class Device(object):
 			unknown_error = 'Unknown Error ({0:x})'.format(code)
 			msg = "Getting the sample grabber's current buffer failed ({0}).".format(error_map.get(code, unknown_error))
 			raise VidCapError(msg)
-		
+
 		return bytes(buffer[:size.value]), (width, height)
 
 	def get_image(self, timestamp=None, font='normal', textpos='bottom-left'):
@@ -269,7 +269,7 @@ class Device(object):
 		         are allowed.
 		         Vertical positions: top or bottom
 		         Horizontal positions: left, center, right
-		         
+
 		         defaults to 'bottom-left'
 		"""
 		buffer, dimensions = self.get_buffer()
@@ -343,9 +343,9 @@ class Device(object):
 def save_frame(filename = 'test.jpg', resolution = None, mode=None):
 	"""
 	Save a video frame from the default device.
-	
+
 	resolution, if specified, should be something like (320,240)
-	
+
 	mode should be a dictionary of mode key/values, like
 	 dict(flip_horizontal=True)
 	"""
