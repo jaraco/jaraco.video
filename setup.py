@@ -42,7 +42,7 @@ setup_params = dict(
 		'comtypes',
 	],
 	extras_require = {
-		'imaging': 'PIL',
+		'imaging': 'Pillow',
 	},
 	dependency_links = [
 	],
