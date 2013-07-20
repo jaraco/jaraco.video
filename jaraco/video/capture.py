@@ -19,6 +19,7 @@ import datetime
 import re
 import time
 import logging
+from ctypes import windll, byref, cast, create_string_buffer, c_long
 
 try:
 	from PIL import Image, ImageFont, ImageDraw
@@ -26,7 +27,17 @@ except ImportError:
 	warnings.warn("PIL not available, many functions will be "
 		"unavailable")
 
-from .api.objects import *
+from .api.objects import (
+	CreateObject, FilterGraph, IMediaControl,
+	CaptureGraphBuilder2, DeviceEnumerator, CLSID_VideoInputDeviceCategory,
+	POINTER, IMoniker, IBaseFilter, tag_AMMediaType, MEDIATYPE_Video,
+	MEDIASUBTYPE_RGB24, FORMAT_VideoInfo, PIN_CATEGORY_CAPTURE, IBindCtx,
+	SampleGrabber, IVideoWindow, OA_FALSE, OA_TRUE, ISpecifyPropertyPages,
+	OleCreatePropertyFrame, MEDIATYPE_Interleaved, COMError,
+	IAMStreamConfig, IAMVideoControl, PINDIR_OUTPUT, PIN_CATEGORY_CAPTURE,
+	VideoControlFlags, VidCapError, VIDEOINFOHEADER, DeleteMediaType,
+	VFW_E_WRONG_STATE, LPUNKNOWN,
+)
 
 log = logging.getLogger(__name__)
 
@@ -156,9 +167,11 @@ class Device(object):
 
 	def _get_ppin(self):
 		try:
-			return self.graph_builder.FindPin(self.source, PINDIR_OUTPUT, PIN_CATEGORY_CAPTURE, MEDIATYPE_Interleaved, False, 0)
+			return self.graph_builder.FindPin(self.source, PINDIR_OUTPUT,
+				PIN_CATEGORY_CAPTURE, MEDIATYPE_Interleaved, False, 0)
 		except COMError:
-			return self.graph_builder.FindPin(self.source, PINDIR_OUTPUT, PIN_CATEGORY_CAPTURE, MEDIATYPE_Video, False, 0)
+			return self.graph_builder.FindPin(self.source, PINDIR_OUTPUT,
+				PIN_CATEGORY_CAPTURE, MEDIATYPE_Video, False, 0)
 
 	def get_capabilities(self):
 		video_control = self._get_video_control()
