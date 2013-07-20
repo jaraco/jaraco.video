@@ -5,7 +5,7 @@ Video Framegrabber for Windows
 Copyright © 2009-2013 Jason R. Coombs
 
 Based on the C++ extension-based version by Markus Gritsch:
- http://videocapture.sourceforge.net/
+	http://videocapture.sourceforge.net/
 
 This version has been refactored for easier packaging. For a version
 that is fully compatibly with the Gritsch library, please download
@@ -249,23 +249,26 @@ class Device(object):
 	def get_image(self, timestamp=None, font='normal', textpos='bottom-left'):
 		"""Returns a PIL Image instance.
 
-		timestamp:  None    ...       no timestamp (the default)
-		            simple  ...       simple timestamp
-		            shadow  ...       timestamp with shadow
-		            outline ...       timestamp with outline
-		            thick-outline ... timestamp with thick outline
+		timestamp:
+			None    ...       no timestamp (the default)
+			simple  ...       simple timestamp
+			shadow  ...       timestamp with shadow
+			outline ...       timestamp with outline
+			thick-outline ... timestamp with thick outline
 
-		font:  normal ... normal font (the default)
-		       bold   ... bold font
+		font:
+			normal ... normal font (the default)
+			bold   ... bold font
 
-		textpos: The position of the timestamp can be specified by a string
-		         containing a combination of two words specifying the vertical
-		         and horizontal position of the timestamp.  Abbreviations
-		         are allowed.
-		         Vertical positions: top or bottom
-		         Horizontal positions: left, center, right
+		textpos:
+			The position of the timestamp can be specified by a string
+			containing a combination of two words specifying the vertical
+			and horizontal position of the timestamp.  Abbreviations
+			are allowed.
+			Vertical positions: top or bottom
+			Horizontal positions: left, center, right
 
-		         defaults to 'bottom-left'
+			defaults to 'bottom-left'
 		"""
 		buffer, dimensions = self.get_buffer()
 		# todo, what is 'BGR', 0, -1 ?
@@ -342,7 +345,7 @@ def save_frame(filename = 'test.jpg', resolution = None, mode=None):
 	resolution, if specified, should be something like (320,240)
 
 	mode should be a dictionary of mode key/values, like
-	 dict(flip_horizontal=True)
+	dict(flip_horizontal=True)
 	"""
 	if mode is None: mode = dict()
 	logging.basicConfig(level=logging.INFO)
