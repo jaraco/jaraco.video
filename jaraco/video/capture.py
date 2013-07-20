@@ -75,8 +75,8 @@ class Device(object):
 
 		mt = tag_AMMediaType()
 		mt.majortype = MEDIATYPE_Video
-		mt.subtype = MEDIASUBTYPE_RGB24;
-		mt.formattype = FORMAT_VideoInfo;
+		mt.subtype = MEDIASUBTYPE_RGB24
+		mt.formattype = FORMAT_VideoInfo
 
 		self.grabber.SetMediaType(mt)
 
@@ -143,7 +143,7 @@ class Device(object):
 				]
 		try:
 			result = self.graph_builder.RemoteFindInterface(*args)
-		except COMError as e:
+		except COMError:
 			args[1] = MEDIATYPE_Video
 			result = self.graph_builder.RemoteFindInterface(*args)
 		return cast(result, POINTER(interface)).value
@@ -157,7 +157,7 @@ class Device(object):
 	def _get_ppin(self):
 		try:
 			return self.graph_builder.FindPin(self.source, PINDIR_OUTPUT, PIN_CATEGORY_CAPTURE, MEDIATYPE_Interleaved, False, 0)
-		except COMError as e:
+		except COMError:
 			return self.graph_builder.FindPin(self.source, PINDIR_OUTPUT, PIN_CATEGORY_CAPTURE, MEDIATYPE_Video, False, 0)
 
 	def get_capabilities(self):
