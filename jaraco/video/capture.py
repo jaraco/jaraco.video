@@ -23,13 +23,8 @@ import logging
 try:
 	from PIL import Image, ImageFont, ImageDraw
 except ImportError:
-	try:
-		# installing PIL using setuptools sometimes leaves out the top-
-		#  level module
-		import Image, ImageFont, ImageDraw
-	except ImportError:
-		warnings.warn("PIL not available, many functions will be "
-			"unavailable")
+	warnings.warn("PIL not available, many functions will be "
+		"unavailable")
 
 from .api.objects import *
 
