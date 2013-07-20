@@ -9,7 +9,7 @@ Based on the C++ extension-based version by Markus Gritsch:
 
 This version has been refactored for easier packaging. For a version
 that is fully compatibly with the Gritsch library, please download
-revision 1616 from https://svn.jaraco.com/jaraco/python/jaraco.video.
+revision 0f17f805f7dd.
 """
 
 from __future__ import absolute_import
