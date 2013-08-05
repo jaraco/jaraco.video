@@ -1,17 +1,15 @@
-from comtypes import POINTER
-from comtypes import GUID, CLSCTX_INPROC, COMMETHOD
-from comtypes.client import CreateObject, GetModule
-from comtypes import CoClass, IUnknown, COMError
-from ctypes import (cast, POINTER, Structure, c_longlong,
-	create_string_buffer, byref, c_long, HRESULT)
+from comtypes import GUID, COMMETHOD
+from comtypes.client import GetModule
+from comtypes import CoClass, IUnknown
+from ctypes import POINTER, Structure, c_longlong, c_long, HRESULT
 from ctypes.wintypes import (RECT, DWORD, LONG, WORD, ULONG, HWND,
 	UINT, LPCOLESTR, LCID, LPVOID)
 from ctypes import windll
 
 from comtypes.gen.DirectShowLib import (FilterGraph, CaptureGraphBuilder2,
 	ICreateDevEnum, typelib_path, IBaseFilter, IBindCtx, IMoniker,
-	IAMStreamConfig, IAMVideoControl,)
-from comtypes.gen.DexterLib import (SampleGrabber, tag_AMMediaType)
+	IAMStreamConfig, IAMVideoControl)
+from comtypes.gen.DexterLib import SampleGrabber, tag_AMMediaType
 
 from jaraco.video import bitutil
 
