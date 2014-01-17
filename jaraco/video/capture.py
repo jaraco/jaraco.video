@@ -351,7 +351,7 @@ class Device(object):
 		"""
 		self.get_image(timestamp, font, textpos).save(filename, **kwargs)
 
-def save_frame(filename = 'test.jpg', resolution = None, mode=None):
+def save_frame(filename='test.jpg', resolution=None, mode=None):
 	"""
 	Save a video frame from the default device.
 
