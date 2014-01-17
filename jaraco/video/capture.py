@@ -294,7 +294,7 @@ class Device(object):
 	def _add_text(self, img, text, font, textpos, shadow_style):
 		font = self.fonts[font]
 		text_size = font.getsize(text)
-		tw, th = (dim - 2 for dim in font.getsize(text))
+		tw, th = (dim - 2 for dim in text_size)
 		iw, ih = img.size
 		vert_pos, horiz_pos = re.split('[ -]+', textpos.lower())
 		try:
