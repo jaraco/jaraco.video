@@ -40,6 +40,7 @@ setup_params = dict(
 	),
 	install_requires=[
 		'comtypes',
+		'jaraco.util',
 	],
 	extras_require = {
 		'imaging': 'Pillow',

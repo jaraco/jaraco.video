@@ -48,6 +48,12 @@ This example usage can be seen in the function
 History
 -------
 
+1.2
+~~~
+
+* #1: Require jaraco.util for bitutil, which has progressed with better Python
+  3 support.
+
 1.1
 ~~~
 
