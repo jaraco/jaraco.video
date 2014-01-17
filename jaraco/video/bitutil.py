@@ -19,7 +19,7 @@ except ImportError:
 		application.
 		>>> get_bit_values(0x3, 2)
 		[1L, 1L]
-		
+
 		>>> get_bit_values(0x3, 4)
 		[0L, 0L, 1L, 1L]
 		"""
@@ -43,7 +43,7 @@ except ImportError:
 		"""
 		Take a sequence of bits, most significant first, and
 		coalesce them into a number.
-		
+
 		>>> coalesce([1,0,1])
 		5
 		"""
@@ -54,7 +54,7 @@ except ImportError:
 		"""
 		Subclasses should define _names, a list of flag names beginning
 		with the least-significant bit.
-		
+
 		>>> MyFlags = type('MyFlags', (Flags,), dict(_names=tuple('abc')))
 		>>> mf = MyFlags.from_number(5)
 		>>> mf['a']
