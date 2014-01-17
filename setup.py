@@ -19,7 +19,7 @@ setup_params = dict(
 	long_description = open('README').read().strip(),
 	author = 'Jason R. Coombs',
 	author_email = 'jaraco@jaraco.com',
-	url = 'http://pypi.python.org/pypi/'+name,
+	url = 'https://bitbucket.org/jaraco/'+name,
 	packages = find_packages(exclude=['tests']),
 	include_package_data=True,
 	zip_safe=True,
