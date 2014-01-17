@@ -2,7 +2,7 @@
 """
 Video Framegrabber for Windows
 
-Copyright © 2009-2013 Jason R. Coombs
+Copyright © 2009-2014 Jason R. Coombs
 
 Based on the C++ extension-based version by Markus Gritsch:
 	http://videocapture.sourceforge.net/
@@ -14,18 +14,13 @@ revision 0f17f805f7dd.
 
 from __future__ import absolute_import
 
-import warnings
 import datetime
 import re
 import time
 import logging
 from ctypes import windll, byref, cast, create_string_buffer, c_long
 
-try:
-	from PIL import Image, ImageFont, ImageDraw
-except ImportError:
-	warnings.warn("PIL not available, many functions will be "
-		"unavailable")
+import PIL
 
 from .api.objects import (
 	CreateObject, FilterGraph, IMediaControl,
@@ -45,13 +40,10 @@ def consume(iterable):
 	for x in iterable: pass
 
 class Device(object):
-	try:
-		fonts = dict(
-			normal = ImageFont.truetype('arial.ttf',10),
-			bold = ImageFont.truetype('arialbd.ttf',10),
-			)
-	except:
-		log.warning("PIL ImageFont construction failed, text ops will fail")
+	fonts = dict(
+		normal=PIL.ImageFont.truetype('arial.ttf', 10),
+		bold=PIL.ImageFont.truetype('arialbd.ttf', 10),
+	)
 
 	def __init__(self, devnum=0, show_video_window=False):
 		self.devnum = devnum
@@ -285,7 +277,7 @@ class Device(object):
 		"""
 		buffer, dimensions = self.get_buffer()
 		# todo, what is 'BGR', 0, -1 ?
-		img = Image.fromstring('RGB', dimensions, buffer, 'raw', 'BGR', 0, -1)
+		img = PIL.Image.fromstring('RGB', dimensions, buffer, 'raw', 'BGR', 0, -1)
 		if timestamp:
 			text = str(datetime.datetime.now())
 			self._add_text(img, text, font, textpos, timestamp)
@@ -304,7 +296,7 @@ class Device(object):
 		except Exception:
 			raise ValueError("Invalid textpos {0}".format(textpos))
 
-		draw = ImageDraw.Draw(img)
+		draw = PIL.ImageDraw.Draw(img)
 		locs = self._get_shadow_draw_locations(text_coords, shadow_style)
 		textcolor = 0xffffff
 		shadowcolor = 0x000000

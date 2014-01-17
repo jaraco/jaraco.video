@@ -53,6 +53,9 @@ History
 
 * #1: Require jaraco.util for bitutil, which has progressed with better Python
   3 support.
+* #2: Added a hard dependency on Pillow for imaging. The library is pretty
+  useless without it. If there is a use-case out there for using the library
+  without Pillow, please file a request ticket.
 
 1.1
 ~~~
