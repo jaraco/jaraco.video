@@ -36,11 +36,14 @@ be available (no JPEG support, etc).
 Usage
 -----
 
-`jaraco.video` includes a console script "save-frame" which if invoked
-will locate the first video capture device and attempt to save a frame
-to disk as "test.jpg".
+`jaraco.video` includes a console script "save-frame", which
+locates the first video capture device and saves a single frame
+to disk as "test.jpg". The command may also be invoked thus::
 
-This example usage can be seen in `jaraco.video.capture:save_frame`.
+    python -m jaraco.video.capture
+
+This example usage can be seen in the function
+`jaraco.video.capture:save_frame`.
 
 History
 -------
