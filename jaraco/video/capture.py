@@ -34,7 +34,7 @@ from .api.objects import (
 	MEDIASUBTYPE_RGB24, FORMAT_VideoInfo, PIN_CATEGORY_CAPTURE, IBindCtx,
 	SampleGrabber, IVideoWindow, OA_FALSE, OA_TRUE, ISpecifyPropertyPages,
 	OleCreatePropertyFrame, MEDIATYPE_Interleaved, COMError,
-	IAMStreamConfig, IAMVideoControl, PINDIR_OUTPUT, PIN_CATEGORY_CAPTURE,
+	IAMStreamConfig, IAMVideoControl, PINDIR_OUTPUT,
 	VideoControlFlags, VidCapError, VIDEOINFOHEADER, DeleteMediaType,
 	VFW_E_WRONG_STATE, LPUNKNOWN,
 )
