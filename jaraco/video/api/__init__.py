@@ -31,10 +31,10 @@ def generate_typelibs():
 		__name__,
 	)
 	with directory_context(fn('DirectShow')):
-		map(comtypes.client.GetModule, [
+		list(map(comtypes.client.GetModule, [
 			'DirectShow.tlb',
 			'DexterLib.tlb',
-		])
+		]))
 
 if not typelibs_generated():
 	generate_typelibs()
