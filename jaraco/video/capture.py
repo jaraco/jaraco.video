@@ -21,14 +21,16 @@ import logging
 from ctypes import windll, byref, cast, create_string_buffer, c_long
 
 import PIL
+from comtypes.client import CreateObject
+from comtypes import COMError
 
 from .api.objects import (
-	CreateObject, FilterGraph, IMediaControl,
+	FilterGraph, IMediaControl,
 	CaptureGraphBuilder2, DeviceEnumerator, CLSID_VideoInputDeviceCategory,
 	POINTER, IMoniker, IBaseFilter, tag_AMMediaType, MEDIATYPE_Video,
 	MEDIASUBTYPE_RGB24, FORMAT_VideoInfo, PIN_CATEGORY_CAPTURE, IBindCtx,
 	SampleGrabber, IVideoWindow, OA_FALSE, OA_TRUE, ISpecifyPropertyPages,
-	OleCreatePropertyFrame, MEDIATYPE_Interleaved, COMError,
+	OleCreatePropertyFrame, MEDIATYPE_Interleaved,
 	IAMStreamConfig, IAMVideoControl, PINDIR_OUTPUT,
 	VideoControlFlags, VidCapError, VIDEOINFOHEADER, DeleteMediaType,
 	VFW_E_WRONG_STATE, LPUNKNOWN,
