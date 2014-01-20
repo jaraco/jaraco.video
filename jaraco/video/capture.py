@@ -20,7 +20,8 @@ import time
 import logging
 from ctypes import windll, byref, cast, create_string_buffer, c_long
 
-import PIL
+import PIL.ImageFont
+import PIL.ImageDraw
 from comtypes.client import CreateObject
 from comtypes import COMError
 
