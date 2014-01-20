@@ -26,13 +26,6 @@ with
 `jaraco.video` is designed to run on Python 2.6+, including Python 3,
 and including 32-bit and 64-bit versions of Python.
 
-Issues
-------
-
-Although the package currently installs on Python 3, there is currently
-no supported version of PIL for Python 3, so only raw bitmap data will
-be available (no JPEG support, etc).
-
 Usage
 -----
 
