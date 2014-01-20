@@ -23,7 +23,7 @@ You can install it with ``easy_install jaraco.video``, or from the
 with
 ``easy_install jaraco.video==dev``.
 
-`jaraco.video` is designed to run on Python 2.5+, including Python 3,
+`jaraco.video` is designed to run on Python 2.6+, including Python 3,
 and including 32-bit and 64-bit versions of Python.
 
 Issues
