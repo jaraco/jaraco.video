@@ -12,7 +12,7 @@ __author__ = 'Jason R. Coombs <jaraco@jaraco.com>'
 
 name = 'jaraco.video'
 
-with open('README') as readme_stream:
+with open('README.txt') as readme_stream:
 	readme = readme_stream.read()
 with open('CHANGES.txt') as changes_stream:
 	changes = changes_stream.read()
