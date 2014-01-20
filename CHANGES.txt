@@ -1,6 +1,14 @@
 History
 -------
 
+1.2.1
+~~~~~
+
+* Fixed several errors in the code due to untested refactorings for Python 3
+  support. The code now runs properly under Python 3.
+* #3: Added notes about deploying the latest version of comtypes with bug
+  fixes from jaraco's mirror.
+
 1.2
 ~~~
 
