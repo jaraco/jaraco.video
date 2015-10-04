@@ -11,7 +11,7 @@ from comtypes.gen.DirectShowLib import (FilterGraph, CaptureGraphBuilder2,
 	IAMStreamConfig, IAMVideoControl)
 from comtypes.gen.DexterLib import SampleGrabber, tag_AMMediaType
 
-from jaraco.util import bitutil
+from jaraco.structures import binary
 
 _quartz = GetModule('quartz.dll')
 IMediaControl = _quartz.IMediaControl
@@ -126,5 +126,5 @@ def DeleteMediaType(mt):
 	#  handle that
 	#windll.ole32.CoTaskMemFree(mt)
 
-class VideoControlFlags(bitutil.Flags):
+class VideoControlFlags(binary.Flags):
 	_names = 'flip_horizontal flip_vertical external_trigger_enable trigger'.split()

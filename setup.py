@@ -46,8 +46,8 @@ setup_params = dict(
 	),
 	install_requires=[
 		'comtypes',
-		'jaraco.util',
 		'Pillow',
+		'jaraco.structures',
 	],
 	extras_require = {
 	},
