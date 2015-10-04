@@ -1,6 +1,3 @@
-.. -*- restructuredtext -*-
-
-============
 jaraco.video
 ============
 

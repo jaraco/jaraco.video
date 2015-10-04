@@ -1,4 +1,2 @@
-syntax: glob
-dist
 build
-*.egg
+dist
