@@ -1,6 +1,12 @@
 History
 -------
 
+2.0
+~~~
+
+* Dropped support for Python 2.6.
+* Moved hosting to Github.
+
 1.3
 ~~~
 
