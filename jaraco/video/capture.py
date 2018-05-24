@@ -280,7 +280,7 @@ class Device(object):
 		"""
 		buffer, dimensions = self.get_buffer()
 		# todo, what is 'BGR', 0, -1 ?
-		img = PIL.Image.fromstring('RGB', dimensions, buffer, 'raw', 'BGR', 0, -1)
+		img = PIL.Image.frombytes('RGB', dimensions, buffer, 'raw', 'BGR', 0, -1)
 		if timestamp:
 			text = str(datetime.datetime.now())
 			self._add_text(img, text, font, textpos, timestamp)

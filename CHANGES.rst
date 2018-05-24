@@ -1,3 +1,8 @@
+2.1.1
+=====
+
+* #8: For compatibility with later Pillow versions, use ``frombytes``.
+
 2.1
 ===
 
