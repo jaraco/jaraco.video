@@ -39,8 +39,11 @@ from .api.objects import (
 
 log = logging.getLogger(__name__)
 
+
 def consume(iterable):
-	for x in iterable: pass
+	for x in iterable:
+		pass
+
 
 class Device(object):
 	fonts = dict(
@@ -59,8 +62,9 @@ class Device(object):
 		self.graph_builder = CreateObject(CaptureGraphBuilder2)
 		self.graph_builder.SetFiltergraph(self.filter_graph)
 		dev_enum = CreateObject(DeviceEnumerator)
-		class_enum = dev_enum.CreateClassEnumerator(CLSID_VideoInputDeviceCategory, 0)
-		#del dev_enum
+		class_enum = dev_enum.CreateClassEnumerator(
+			CLSID_VideoInputDeviceCategory, 0)
+		# del dev_enum
 
 		# for now, assume one device
 		try:
@@ -72,7 +76,8 @@ class Device(object):
 
 		null_context = POINTER(IBindCtx)()
 		null_moniker = POINTER(IMoniker)()
-		self.source = moniker.RemoteBindToObject(null_context,null_moniker,IBaseFilter._iid_)
+		self.source = moniker.RemoteBindToObject(
+			null_context, null_moniker, IBaseFilter._iid_)
 
 		self.filter_graph.AddFilter(self.source, "VideoCapture")
 
@@ -92,7 +97,7 @@ class Device(object):
 			self.source,
 			self.grabber,
 			None,
-			)
+		)
 
 		window = self.filter_graph.QueryInterface(IVideoWindow)
 		window.AutoShow = [OA_FALSE, OA_TRUE][self.show_video_window]
@@ -142,11 +147,11 @@ class Device(object):
 
 	def _get_graph_builder_interface(self, interface):
 		args = [
-				PIN_CATEGORY_CAPTURE,
-				MEDIATYPE_Interleaved,
-				self.source,
-				interface._iid_,
-				]
+			PIN_CATEGORY_CAPTURE,
+			MEDIATYPE_Interleaved,
+			self.source,
+			interface._iid_,
+		]
 		try:
 			result = self.graph_builder.RemoteFindInterface(*args)
 		except COMError:
@@ -162,10 +167,12 @@ class Device(object):
 
 	def _get_ppin(self):
 		try:
-			return self.graph_builder.FindPin(self.source, PINDIR_OUTPUT,
+			return self.graph_builder.FindPin(
+				self.source, PINDIR_OUTPUT,
 				PIN_CATEGORY_CAPTURE, MEDIATYPE_Interleaved, False, 0)
 		except COMError:
-			return self.graph_builder.FindPin(self.source, PINDIR_OUTPUT,
+			return self.graph_builder.FindPin(
+				self.source, PINDIR_OUTPUT,
 				PIN_CATEGORY_CAPTURE, MEDIATYPE_Video, False, 0)
 
 	def get_capabilities(self):
@@ -202,9 +209,9 @@ class Device(object):
 		hdr.width, hdr.height = width, height
 		stream_config.SetFormat(media_type)
 		DeleteMediaType(media_type)
-		#stream_config.Release()
-		#self.teardown()
-		#self.initialize()
+		# stream_config.Release()
+		# self.teardown()
+		# self.initialize()
 
 	def get_buffer(self):
 		media_type = tag_AMMediaType()
@@ -249,7 +256,8 @@ class Device(object):
 			)
 			code = e[0]
 			unknown_error = 'Unknown Error ({0:x})'.format(code)
-			msg = "Getting the sample grabber's current buffer failed ({0}).".format(error_map.get(code, unknown_error))
+			msg = "Getting the sample grabber's current buffer failed ({0}).".format(
+				error_map.get(code, unknown_error))
 			raise VidCapError(msg)
 
 		return bytes(buffer[:size.value]), (width, height)
@@ -293,9 +301,9 @@ class Device(object):
 		iw, ih = img.size
 		vert_pos, horiz_pos = re.split('[ -]+', textpos.lower())
 		try:
-			x = dict(l=2, c=(iw-tw)//2, r=iw-tw-2)[horiz_pos[0]]
-			y = dict(t=-1, b=ih-th-2)[vert_pos[0]]
-			text_coords = (x,y)
+			x = dict(l=2, c=(iw - tw) // 2, r=iw - tw - 2)[horiz_pos[0]]  # noqa: E741
+			y = dict(t=-1, b=ih - th - 2)[vert_pos[0]]
+			text_coords = x, y
 		except Exception:
 			raise ValueError("Invalid textpos {0}".format(textpos))
 
@@ -309,21 +317,24 @@ class Device(object):
 	@staticmethod
 	def _get_shadow_draw_locations(origin, shadow_style):
 		x, y = origin
-		outline_locs = ((x-1, y), (x+1, y), (x, y-1), (x, y+1))
+		outline_locs = ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1))
 		shadow_draw_locations = dict(
-			simple = (),
-			shadow = ((x+1, y), (x, y+1), (x+1, y+1)),
-			outline = outline_locs,
-			)
+			simple=(),
+			shadow=((x + 1, y), (x, y + 1), (x + 1, y + 1)),
+			outline=outline_locs,
+		)
 		shadow_draw_locations['thick-outline'] = (
-			outline_locs + ((x-1, y-1), (x+1, y-1), (x-1, y+1), (x+1, y+1))
+			outline_locs + (
+				(x - 1, y - 1), (x + 1, y - 1), (x - 1, y + 1), (x + 1, y + 1),
 			)
+		)
 		locs = shadow_draw_locations.get(shadow_style)
 		if locs is None:
 			raise ValueError("Unknown shadow style {0}".format(shadow_style))
 		return locs
 
-	def save_snapshot(self, filename, timestamp=None,
+	def save_snapshot(
+		self, filename, timestamp=None,
 		font='normal', textpos='bottom-left', *args, **kwargs):
 		"""
 		Saves a snapshot to a file.
@@ -346,6 +357,7 @@ class Device(object):
 		"""
 		self.get_image(timestamp, font, textpos).save(filename, **kwargs)
 
+
 def save_frame(filename='test.jpg', resolution=None, mode=None):
 	"""
 	Save a video frame from the default device.
@@ -355,7 +367,8 @@ def save_frame(filename='test.jpg', resolution=None, mode=None):
 	mode should be a dictionary of mode key/values, like
 	dict(flip_horizontal=True)
 	"""
-	if mode is None: mode = dict()
+	if mode is None:
+		mode = dict()
 	logging.basicConfig(level=logging.INFO)
 	d = Device(show_video_window=False)
 	if resolution:
@@ -363,6 +376,7 @@ def save_frame(filename='test.jpg', resolution=None, mode=None):
 	for pair in mode.items():
 		d.set_mode(*pair)
 	d.save_snapshot(filename, timestamp='simple')
+
 
 if __name__ == '__main__':
 	save_frame()
