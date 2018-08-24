@@ -30,7 +30,7 @@ params = dict(
 		'comtypes',
 		'Pillow',
 		'jaraco.structures',
-    ],
+	],
 	extras_require={
 		'testing': [
 			# upstream

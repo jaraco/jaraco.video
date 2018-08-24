@@ -4,12 +4,14 @@ import functools
 import comtypes.client
 import contextlib
 
-def raises_error(callable, exception = Exception):
+
+def raises_error(callable, exception=Exception):
 	try:
 		callable()
 	except exception:
 		return True
 	return False
+
 
 def typelibs_generated():
 	import_SG = functools.partial(
@@ -18,12 +20,14 @@ def typelibs_generated():
 	)
 	return not raises_error(import_SG)
 
+
 @contextlib.contextmanager
 def directory_context(dir):
 	orig = os.getcwd()
 	os.chdir(dir)
 	yield
 	os.chdir(orig)
+
 
 def generate_typelibs():
 	fn = functools.partial(
@@ -35,6 +39,7 @@ def generate_typelibs():
 			'DirectShow.tlb',
 			'DexterLib.tlb',
 		]))
+
 
 if not typelibs_generated():
 	generate_typelibs()
