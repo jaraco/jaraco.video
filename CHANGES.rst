@@ -1,3 +1,8 @@
+2.2.1
+=====
+
+* #9: The name was meant to be ``_AMMediaType``.
+
 2.2
 ===
 

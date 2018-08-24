@@ -28,7 +28,7 @@ from comtypes import COMError
 from .api.objects import (
 	FilterGraph, IMediaControl,
 	CaptureGraphBuilder2, DeviceEnumerator, CLSID_VideoInputDeviceCategory,
-	POINTER, IMoniker, IBaseFilter, tag_AMMediaType, MEDIATYPE_Video,
+	POINTER, IMoniker, IBaseFilter, _AMMediaType, MEDIATYPE_Video,
 	MEDIASUBTYPE_RGB24, FORMAT_VideoInfo, PIN_CATEGORY_CAPTURE, IBindCtx,
 	SampleGrabber, IVideoWindow, OA_FALSE, OA_TRUE, ISpecifyPropertyPages,
 	OleCreatePropertyFrame, MEDIATYPE_Interleaved,
@@ -84,7 +84,7 @@ class Device(object):
 		self.grabber = CreateObject(SampleGrabber)
 		self.filter_graph.AddFilter(self.grabber, "Grabber")
 
-		mt = tag_AMMediaType()
+		mt = _AMMediaType()
 		mt.majortype = MEDIATYPE_Video
 		mt.subtype = MEDIASUBTYPE_RGB24
 		mt.formattype = FORMAT_VideoInfo
@@ -214,7 +214,7 @@ class Device(object):
 		# self.initialize()
 
 	def get_buffer(self):
-		media_type = tag_AMMediaType()
+		media_type = _AMMediaType()
 		self.grabber.GetConnectedMediaType(media_type)
 
 		p_video_info_header = cast(media_type.pbFormat, POINTER(VIDEOINFOHEADER))

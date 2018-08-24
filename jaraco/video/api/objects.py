@@ -13,13 +13,13 @@ from comtypes.gen.DirectShowLib import (
 	IBindCtx, IMoniker,
 	IAMStreamConfig, IAMVideoControl,
 )
-from comtypes.gen.DexterLib import SampleGrabber, AMMediaType
+from comtypes.gen.DexterLib import SampleGrabber, _AMMediaType
 
 from jaraco.structures import binary
 
 
 __all__ = [
-	'SampleGrabber', 'AMMediaType',
+	'SampleGrabber', '_AMMediaType',
 	'FilterGraph', 'CaptureGraphBuilder2',
 	'ICreateDevEnum', 'typelib_path', 'IBaseFilter',
 	'IBindCtx', 'IMoniker',
