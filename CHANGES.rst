@@ -1,3 +1,9 @@
+2.2
+===
+
+* #9: Expect ``AMMediaType`` in DexterLib and not ``tag_AMMediaType``.
+  Cause for the change is unknown.
+
 2.1.1
 =====
 
