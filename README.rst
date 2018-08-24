@@ -3,11 +3,11 @@
 
 .. image:: https://img.shields.io/pypi/pyversions/jaraco.video.svg
 
-.. image:: https://img.shields.io/travis/jaraco/jaraco.video/master.svg
-   :target: https://travis-ci.org/jaraco/jaraco.video
+.. .. image:: https://img.shields.io/travis/jaraco/jaraco.video/master.svg
+..    :target: https://travis-ci.org/jaraco/jaraco.video
 
-.. .. image:: https://img.shields.io/appveyor/ci/jaraco/jaraco-video/master.svg
-..    :target: https://ci.appveyor.com/project/jaraco/jaraco-video/branch/master
+.. image:: https://img.shields.io/appveyor/ci/jaraco/jaraco-video/master.svg
+   :target: https://ci.appveyor.com/project/jaraco/jaraco-video/branch/master
 
 .. .. image:: https://readthedocs.org/projects/jaracovideo/badge/?version=latest
 ..    :target: https://jaracovideo.readthedocs.io/en/latest/?badge=latest
