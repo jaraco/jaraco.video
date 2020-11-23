@@ -34,9 +34,6 @@ devices.
 <http://videocapture.sourceforge.net/>`_ in pure Python using ctypes
 and comtypes.
 
-`jaraco.video` is designed to run on Python 2.7+, including Python 3,
-and including 32-bit and 64-bit versions of Python.
-
 Usage
 -----
 
