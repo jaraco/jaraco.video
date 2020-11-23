@@ -18,6 +18,7 @@ import datetime
 import re
 import time
 import logging
+import contextlib
 from ctypes import windll, byref, cast, create_string_buffer, c_long
 
 import PIL.ImageFont
@@ -67,17 +68,12 @@ def consume(iterable):
 
 
 def _load_fonts():
-    try:
+    # in some environments, like Docker or Windows Server core
+    # the load fails.
+    with contextlib.suppress(OSError):
         return dict(
             normal=PIL.ImageFont.truetype('arial.ttf', 10),
             bold=PIL.ImageFont.truetype('arialbd.ttf', 10),
-        )
-    except OSError:
-        # in some environments, like Docker or Windows Server core
-        # the load fails, but lucon succeeds.
-        return dict(
-            normal=PIL.ImageFont.truetype('lucon.ttf', 10),
-            bold=PIL.ImageFont.truetype('lucon.ttf', 10),
         )
 
 
