@@ -66,11 +66,23 @@ def consume(iterable):
         pass
 
 
+def _load_fonts():
+    try:
+        return dict(
+            normal=PIL.ImageFont.truetype('arial.ttf', 10),
+            bold=PIL.ImageFont.truetype('arialbd.ttf', 10),
+        )
+    except OSError:
+        # in some environments, like Docker or Windows Server core
+        # the load fails, but lucon succeeds.
+        return dict(
+            normal=PIL.ImageFont.truetype('lucon.ttf', 10),
+            bold=PIL.ImageFont.truetype('lucon.ttf', 10),
+        )
+
+
 class Device(object):
-    fonts = dict(
-        normal=PIL.ImageFont.truetype('arial.ttf', 10),
-        bold=PIL.ImageFont.truetype('arialbd.ttf', 10),
-    )
+    fonts = _load_fonts()
 
     def __init__(self, devnum=0, show_video_window=False):
         self.devnum = devnum
