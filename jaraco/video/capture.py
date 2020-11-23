@@ -34,7 +34,7 @@ from .api.objects import (
     POINTER,
     IMoniker,
     IBaseFilter,
-    _AMMediaType,
+    tag_AMMediaType,
     MEDIATYPE_Video,
     MEDIASUBTYPE_RGB24,
     FORMAT_VideoInfo,
@@ -105,7 +105,7 @@ class Device(object):
         self.grabber = CreateObject(SampleGrabber)
         self.filter_graph.AddFilter(self.grabber, "Grabber")
 
-        mt = _AMMediaType()
+        mt = tag_AMMediaType()
         mt.majortype = MEDIATYPE_Video
         mt.subtype = MEDIASUBTYPE_RGB24
         mt.formattype = FORMAT_VideoInfo
@@ -252,7 +252,7 @@ class Device(object):
         # self.initialize()
 
     def get_buffer(self):
-        media_type = _AMMediaType()
+        media_type = tag_AMMediaType()
         self.grabber.GetConnectedMediaType(media_type)
 
         p_video_info_header = cast(media_type.pbFormat, POINTER(VIDEOINFOHEADER))

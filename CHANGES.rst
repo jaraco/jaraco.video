@@ -1,3 +1,8 @@
+v4.0.0
+======
+
+* #9: In DexterLib, once again the media type is ``tag_AMMediaType``.
+
 3.0
 ===
 
