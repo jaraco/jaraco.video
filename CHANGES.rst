@@ -2,6 +2,7 @@ v4.0.0
 ======
 
 * #9: In DexterLib, once again the media type is ``tag_AMMediaType``.
+* Require Python 3.6 or later.
 
 3.0
 ===
