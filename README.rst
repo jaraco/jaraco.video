@@ -1,28 +1,18 @@
-.. image:: https://img.shields.io/pypi/v/skeleton.svg
+.. image:: https://img.shields.io/pypi/v/jaraco.video.svg
    :target: `PyPI link`_
 
-.. image:: https://img.shields.io/pypi/pyversions/skeleton.svg
+.. image:: https://img.shields.io/pypi/pyversions/jaraco.video.svg
    :target: `PyPI link`_
 
-.. _PyPI link: https://pypi.org/project/skeleton
+.. _PyPI link: https://pypi.org/project/jaraco.video
 
-.. image:: https://github.com/jaraco/skeleton/workflows/Automated%20Tests/badge.svg
-   :target: https://github.com/jaraco/skeleton/actions?query=workflow%3A%22Automated+Tests%22
+.. image:: https://github.com/jaraco/jaraco.video/workflows/Automated%20Tests/badge.svg
+   :target: https://github.com/jaraco/jaraco.video/actions?query=workflow%3A%22Automated+Tests%22
    :alt: Automated Tests
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
    :target: https://github.com/psf/black
    :alt: Code style: Black
-.. image:: https://img.shields.io/pypi/v/jaraco.video.svg
-   :target: https://pypi.org/project/jaraco.video
-
-.. image:: https://img.shields.io/pypi/pyversions/jaraco.video.svg
-
-.. .. image:: https://img.shields.io/travis/jaraco/jaraco.video/master.svg
-..    :target: https://travis-ci.org/jaraco/jaraco.video
-
-.. image:: https://img.shields.io/appveyor/ci/jaraco/jaraco-video/master.svg
-   :target: https://ci.appveyor.com/project/jaraco/jaraco-video/branch/master
 
 .. .. image:: https://readthedocs.org/projects/jaracovideo/badge/?version=latest
 ..    :target: https://jaracovideo.readthedocs.io/en/latest/?badge=latest
