@@ -1,3 +1,8 @@
+v4.0.2
+======
+
+* Switch to PEP 420 namespace package.
+
 v4.0.1
 ======
 
