@@ -72,4 +72,9 @@ type = [
 [project.scripts]
 save-frame = "jaraco.video.capture:save_frame"
 
+
 [tool.setuptools_scm]
+
+
+[tool.pytest-enabler.mypy]
+# Disabled due to jaraco/skeleton#143
