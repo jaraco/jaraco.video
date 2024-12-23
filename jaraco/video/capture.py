@@ -295,7 +295,6 @@ class Device(object):
                 else:
                     break
         except COMError as e:
-
             error_map = dict(
                 E_INVALIDARG="Samples are not being buffered",
                 E_POINTER="NULL pointer argument",
@@ -390,7 +389,7 @@ class Device(object):
         font='normal',
         textpos='bottom-left',
         *args,
-        **kwargs
+        **kwargs,
     ):
         """
         Saves a snapshot to a file.
