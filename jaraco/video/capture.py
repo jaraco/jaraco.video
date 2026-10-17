@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 """
 Video Framegrabber for Windows
 
@@ -12,51 +11,49 @@ that is fully compatibly with the Gritsch library, please download
 revision 0f17f805f7dd.
 """
 
-from __future__ import absolute_import
-
+import contextlib
 import datetime
+import logging
 import re
 import time
-import logging
-import contextlib
-from ctypes import windll, byref, cast, create_string_buffer, c_long
+from ctypes import byref, c_long, cast, create_string_buffer, windll
 
-import PIL.ImageFont
 import PIL.ImageDraw
-from comtypes.client import CreateObject
+import PIL.ImageFont
 from comtypes import COMError
+from comtypes.client import CreateObject
 
 from .api.objects import (
-    FilterGraph,
-    IMediaControl,
-    CaptureGraphBuilder2,
-    DeviceEnumerator,
-    CLSID_VideoInputDeviceCategory,
-    POINTER,
-    IMoniker,
-    IBaseFilter,
-    tag_AMMediaType,
-    MEDIATYPE_Video,
+    LPUNKNOWN,
     MEDIASUBTYPE_RGB24,
-    FORMAT_VideoInfo,
-    PIN_CATEGORY_CAPTURE,
-    IBindCtx,
-    SampleGrabber,
-    IVideoWindow,
     OA_FALSE,
     OA_TRUE,
-    ISpecifyPropertyPages,
-    OleCreatePropertyFrame,
-    MEDIATYPE_Interleaved,
+    PIN_CATEGORY_CAPTURE,
+    PINDIR_OUTPUT,
+    POINTER,
+    VFW_E_WRONG_STATE,
+    VIDEOINFOHEADER,
+    CaptureGraphBuilder2,
+    CLSID_VideoInputDeviceCategory,
+    DeleteMediaType,
+    DeviceEnumerator,
+    FilterGraph,
+    FORMAT_VideoInfo,
     IAMStreamConfig,
     IAMVideoControl,
-    PINDIR_OUTPUT,
-    VideoControlFlags,
+    IBaseFilter,
+    IBindCtx,
+    IMediaControl,
+    IMoniker,
+    ISpecifyPropertyPages,
+    IVideoWindow,
+    MEDIATYPE_Interleaved,
+    MEDIATYPE_Video,
+    OleCreatePropertyFrame,
+    SampleGrabber,
     VidCapError,
-    VIDEOINFOHEADER,
-    DeleteMediaType,
-    VFW_E_WRONG_STATE,
-    LPUNKNOWN,
+    VideoControlFlags,
+    tag_AMMediaType,
 )
 
 log = logging.getLogger(__name__)
@@ -77,7 +74,7 @@ def _load_fonts():
         )
 
 
-class Device(object):
+class Device:
     fonts = _load_fonts()
 
     def __init__(self, devnum=0, show_video_window=False):
@@ -96,7 +93,7 @@ class Device(object):
 
         # for now, assume one device
         try:
-            (moniker, fetched) = class_enum.RemoteNext(1)
+            (moniker, _fetched) = class_enum.RemoteNext(1)
         except ValueError:
             raise RuntimeError("Device not found")
 
@@ -302,10 +299,9 @@ class Device(object):
                 VFW_E_WRONG_STATE="The filter did not buffer a sample yet",
             )
             code = e.args[0]
-            unknown_error = 'Unknown Error ({0:x})'.format(code)
-            msg = "Getting the sample grabber's current buffer failed ({0}).".format(
-                error_map.get(code, unknown_error)
-            )
+            unknown_error = f'Unknown Error ({code:x})'
+            reason = error_map.get(code, unknown_error)
+            msg = f"Getting the sample grabber's current buffer failed ({reason})."
             raise VidCapError(msg)
 
         return bytes(buffer[: size.value]), (width, height)
@@ -349,17 +345,17 @@ class Device(object):
         iw, ih = img.size
         vert_pos, horiz_pos = re.split('[ -]+', textpos.lower())
         try:
-            x = dict(l=2, c=(iw - tw) // 2, r=iw - tw - 2)[horiz_pos[0]]  # noqa: E741
+            x = dict(l=2, c=(iw - tw) // 2, r=iw - tw - 2)[horiz_pos[0]]
             y = dict(t=-1, b=ih - th - 2)[vert_pos[0]]
             text_coords = x, y
-        except Exception:
-            raise ValueError("Invalid textpos {0}".format(textpos))
+        except (KeyError, IndexError):
+            raise ValueError(f"Invalid textpos {textpos}")
 
         draw = PIL.ImageDraw.Draw(img)
         locs = self._get_shadow_draw_locations(text_coords, shadow_style)
         textcolor = 0xFFFFFF
         shadowcolor = 0x000000
-        consume((draw.text(loc, text, font, fill=shadowcolor) for loc in locs))
+        consume(draw.text(loc, text, font, fill=shadowcolor) for loc in locs)
         draw.text(text_coords, text, font=font, fill=textcolor)
 
     @staticmethod
@@ -379,7 +375,7 @@ class Device(object):
         )
         locs = shadow_draw_locations.get(shadow_style)
         if locs is None:
-            raise ValueError("Unknown shadow style {0}".format(shadow_style))
+            raise ValueError(f"Unknown shadow style {shadow_style}")
         return locs
 
     def save_snapshot(
@@ -423,7 +419,7 @@ def save_frame(filename='test.jpg', resolution=None, mode=None):
     dict(flip_horizontal=True)
     """
     if mode is None:
-        mode = dict()
+        mode = {}
     logging.basicConfig(level=logging.INFO)
     d = Device(show_video_window=False)
     if resolution:

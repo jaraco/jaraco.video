@@ -1,49 +1,45 @@
-from comtypes import GUID, COMMETHOD
-from comtypes.client import GetModule
-from comtypes import CoClass, IUnknown
-from ctypes import POINTER, Structure, c_longlong, c_long, HRESULT
+from ctypes import HRESULT, POINTER, Structure, c_long, c_longlong, windll
 from ctypes.wintypes import (
-    RECT,
     DWORD,
-    LONG,
-    WORD,
-    ULONG,
     HWND,
-    UINT,
-    LPCOLESTR,
     LCID,
+    LONG,
+    LPCOLESTR,
     LPVOID,
+    RECT,
+    UINT,
+    ULONG,
+    WORD,
 )
-from ctypes import windll
 
+from comtypes import COMMETHOD, GUID, CoClass, IUnknown
+from comtypes.client import GetModule
+from comtypes.gen.DexterLib import SampleGrabber, tag_AMMediaType
 from comtypes.gen.DirectShowLib import (
-    FilterGraph,
     CaptureGraphBuilder2,
-    ICreateDevEnum,
-    typelib_path,
-    IBaseFilter,
-    IBindCtx,
-    IMoniker,
+    FilterGraph,
     IAMStreamConfig,
     IAMVideoControl,
+    IBaseFilter,
+    IBindCtx,
+    ICreateDevEnum,
+    IMoniker,
+    typelib_path,
 )
-from comtypes.gen.DexterLib import SampleGrabber, tag_AMMediaType
-
 from jaraco.structures import binary
 
-
 __all__ = [
-    'SampleGrabber',
-    'tag_AMMediaType',
-    'FilterGraph',
     'CaptureGraphBuilder2',
-    'ICreateDevEnum',
-    'typelib_path',
-    'IBaseFilter',
-    'IBindCtx',
-    'IMoniker',
+    'FilterGraph',
     'IAMStreamConfig',
     'IAMVideoControl',
+    'IBaseFilter',
+    'IBindCtx',
+    'ICreateDevEnum',
+    'IMoniker',
+    'SampleGrabber',
+    'tag_AMMediaType',
+    'typelib_path',
 ]
 
 _quartz = GetModule('quartz.dll')
@@ -69,8 +65,8 @@ CLSID_SystemDeviceEnum = GUID('{62BE5D10-60EB-11d0-BD3B-00A0C911CE86}')
 
 class DeviceEnumerator(CoClass):
     _reg_clsid_ = CLSID_SystemDeviceEnum
-    _com_interfaces_ = [ICreateDevEnum]
-    _idlflags_ = []  # type: ignore
+    _com_interfaces_ = [ICreateDevEnum]  # noqa: RUF012 # comtypes declaration
+    _idlflags_ = []  # type: ignore  # noqa: RUF012 # comtypes declaration
     _typelib_path_ = typelib_path
     _reg_typelib_ = ('{24BC6711-3881-420F-8299-34DA1026D31E}', 1, 0)
 
@@ -149,8 +145,8 @@ OleCreatePropertyFrame.argtypes = (
 class ISpecifyPropertyPages(IUnknown):
     _case_insensitive_ = True
     _iid_ = GUID('{B196B28B-BAB4-101A-B69C-00AA00341D07}')
-    _idlflags_ = []  # type: ignore
-    _methods_ = [
+    _idlflags_ = []  # type: ignore  # noqa: RUF012 # comtypes declaration
+    _methods_ = [  # noqa: RUF012 # comtypes declaration
         COMMETHOD(
             [],
             HRESULT,
@@ -176,4 +172,4 @@ def DeleteMediaType(mt):
 
 
 class VideoControlFlags(binary.Flags):
-    _names = 'flip_horizontal flip_vertical external_trigger_enable trigger'.split()
+    _names = 'flip_horizontal flip_vertical external_trigger_enable trigger'.split()  # noqa: SIM905

@@ -1,8 +1,9 @@
-import os
-import importlib.resources
-import functools
-import comtypes.client
 import contextlib
+import functools
+import importlib.resources
+import os
+
+import comtypes.client
 
 
 def raises_error(callable, exception=Exception):
