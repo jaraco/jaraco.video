@@ -66,7 +66,7 @@ CLSID_SystemDeviceEnum = GUID('{62BE5D10-60EB-11d0-BD3B-00A0C911CE86}')
 class DeviceEnumerator(CoClass):
     _reg_clsid_ = CLSID_SystemDeviceEnum
     _com_interfaces_ = [ICreateDevEnum]  # noqa: RUF012 # comtypes declaration
-    _idlflags_ = []  # type: ignore  # noqa: RUF012 # comtypes declaration
+    _idlflags_ = []  # type: ignore[var-annotated]  # noqa: RUF012 # comtypes declaration
     _typelib_path_ = typelib_path
     _reg_typelib_ = ('{24BC6711-3881-420F-8299-34DA1026D31E}', 1, 0)
 
@@ -145,7 +145,7 @@ OleCreatePropertyFrame.argtypes = (
 class ISpecifyPropertyPages(IUnknown):
     _case_insensitive_ = True
     _iid_ = GUID('{B196B28B-BAB4-101A-B69C-00AA00341D07}')
-    _idlflags_ = []  # type: ignore  # noqa: RUF012 # comtypes declaration
+    _idlflags_ = []  # type: ignore[var-annotated]  # noqa: RUF012 # comtypes declaration
     _methods_ = [  # noqa: RUF012 # comtypes declaration
         COMMETHOD(
             [],
