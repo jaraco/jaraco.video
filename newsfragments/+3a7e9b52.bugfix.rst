@@ -1,0 +1,1 @@
+Replaced the use of the deprecated (and undeclared) pkg_resources with importlib.resources.

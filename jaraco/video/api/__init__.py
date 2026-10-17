@@ -1,5 +1,5 @@
 import os
-import pkg_resources
+import importlib.resources
 import functools
 import comtypes.client
 import contextlib
@@ -29,11 +29,7 @@ def directory_context(dir):
 
 
 def generate_typelibs():
-    fn = functools.partial(
-        pkg_resources.resource_filename,
-        __name__,
-    )
-    with directory_context(fn('DirectShow')):
+    with directory_context(importlib.resources.files(__name__) / 'DirectShow'):
         list(
             map(
                 comtypes.client.GetModule,
