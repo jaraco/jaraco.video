@@ -301,7 +301,7 @@ class Device(object):
                 VFW_E_NOT_CONNECTED="The filter is not connected",
                 VFW_E_WRONG_STATE="The filter did not buffer a sample yet",
             )
-            code = e[0]
+            code = e.args[0]
             unknown_error = 'Unknown Error ({0:x})'.format(code)
             msg = "Getting the sample grabber's current buffer failed ({0}).".format(
                 error_map.get(code, unknown_error)

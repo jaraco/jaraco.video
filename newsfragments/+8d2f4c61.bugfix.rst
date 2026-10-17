@@ -1,0 +1,1 @@
+Fixed error reporting when the sample grabber's buffer can't be retrieved.
